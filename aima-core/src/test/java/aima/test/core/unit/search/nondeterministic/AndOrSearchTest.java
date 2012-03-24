@@ -129,7 +129,7 @@ class VacuumWorldAgent implements Agent {
  */
 class VacuumWorldActions implements ActionsFunction {
 
-    public static Set<Action> actions = new HashSet<>();
+    public static Set<Action> actions = new HashSet<Action>();
 
     /**
      * Returns possible actions given this state

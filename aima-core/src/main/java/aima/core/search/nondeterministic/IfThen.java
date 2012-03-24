@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class IfThen {
 
-    ArrayList<Conditional> conditionals = new ArrayList<>();
+    ArrayList<Conditional> conditionals = new ArrayList<Conditional>();
 
     /**
      * Adds a conditional to the if-then chain
