@@ -143,7 +143,6 @@ public class VacuumEnvironment extends AbstractEnvironment {
         return envState.getAgentLocation(a);
     }
 
-    
     /**
      * Returns a string representation of the environment
      * @return 
