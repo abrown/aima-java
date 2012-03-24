@@ -1,11 +1,12 @@
 package aima.core.learning.framework;
 
 /**
- * @author Ravi Mohan
  * 
+ * @author Ravi Mohan
  */
 public interface Attribute {
-	public String valueAsString();
 
-	public String name();
+    public String valueAsString();
+
+    public String name();
 }

@@ -1,7 +1,7 @@
 package aima.core.learning.inductive;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import aima.core.learning.framework.Example;
@@ -15,13 +15,13 @@ public class DecisionList {
 
 	private List<DLTest> tests;
 
-	private Hashtable<DLTest, String> testOutcomes;
+	private HashMap<DLTest, String> testOutcomes;
 
 	public DecisionList(String positive, String negative) {
 		this.positive = positive;
 		this.negative = negative;
 		this.tests = new ArrayList<DLTest>();
-		testOutcomes = new Hashtable<DLTest, String>();
+		testOutcomes = new HashMap<DLTest, String>();
 	}
 
 	public String predict(Example example) {

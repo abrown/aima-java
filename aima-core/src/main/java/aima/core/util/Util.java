@@ -2,7 +2,7 @@ package aima.core.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +127,7 @@ public class Util {
 	}
 
 	public static <T> T mode(List<T> l) {
-		Hashtable<T, Integer> hash = new Hashtable<T, Integer>();
+		HashMap<T, Integer> hash = new HashMap<T, Integer>();
 		for (T obj : l) {
 			if (hash.containsKey(obj)) {
 				hash.put(obj, hash.get(obj).intValue() + 1);

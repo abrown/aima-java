@@ -1,6 +1,6 @@
 package aima.test.core.unit.learning.framework;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class InformationAndGainTest {
 	@Test
 	public void testDataSetSplit() throws Exception {
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
-		Hashtable<String, DataSet> hash = ds.splitByAttribute("patrons");// this
+		HashMap<String, DataSet> hash = ds.splitByAttribute("patrons");// this
 		// should
 		// be
 		// the

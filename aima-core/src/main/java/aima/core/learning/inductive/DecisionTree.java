@@ -1,7 +1,7 @@
 package aima.core.learning.inductive;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import aima.core.learning.framework.DataSet;
@@ -16,7 +16,7 @@ public class DecisionTree {
 	private String attributeName;
 
 	// each node modelled as a hash of attribute_value/decisiontree
-	private Hashtable<String, DecisionTree> nodes;
+	private HashMap<String, DecisionTree> nodes;
 
 	protected DecisionTree() {
 
@@ -24,7 +24,7 @@ public class DecisionTree {
 
 	public DecisionTree(String attributeName) {
 		this.attributeName = attributeName;
-		nodes = new Hashtable<String, DecisionTree>();
+		nodes = new HashMap<String, DecisionTree>();
 
 	}
 
