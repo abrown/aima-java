@@ -17,7 +17,7 @@ import java.util.LinkedList;
  */
 public class Plan {
 
-    LinkedList<Object> steps = new LinkedList<>();
+    LinkedList<Object> steps = new LinkedList<Object>();
 
     /**
      * Empty constructor

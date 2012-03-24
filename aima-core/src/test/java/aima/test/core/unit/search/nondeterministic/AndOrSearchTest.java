@@ -129,7 +129,7 @@ class VacuumWorldAgent implements Agent {
  */
 class VacuumWorldActions implements ActionsFunction {
 
-    public static Set<Action> actions = new HashSet<>();
+    public static Set<Action> actions = new HashSet<Action>();
 
     /**
      * Returns possible actions given this state
@@ -171,7 +171,7 @@ class VacuumWorldResults implements ResultsFunction {
     public Set<Object> results(Object _state, Action action) {
         // setup
         VacuumEnvironmentState state = (VacuumEnvironmentState) _state;
-        Set<Object> results = new HashSet<>();
+        Set<Object> results = new HashSet<Object>();
         String current_location = state.getAgentLocation(agent);
         String adjacent_location = (current_location.equals(VacuumEnvironment.LOCATION_A)) ? VacuumEnvironment.LOCATION_B : VacuumEnvironment.LOCATION_A;
         // actions
