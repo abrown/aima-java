@@ -1,213 +1,154 @@
 package aima.core.learning.neural;
 
-import aima.core.util.Util;
-import aima.core.util.math.Matrix;
-import aima.core.util.math.Vector;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
- * Artificial Intelligence A Modern Approach (3rd Edition): page 729<br>
- * <br>
- * 
- * Feed-forward networks are usually arranged in layers, such that each unit
- * receives input only from units in the immediately preceding layer.
- * 
- * @author Ravi Mohan
- * @author Mike Stampone
+ * Neural network layer
+ * @author andrew
  */
-public class Layer {
-	// vectors are represented by n * 1 matrices;
-	private final Matrix weightMatrix;
+public class Layer implements Iterable<Perceptron>, Serializable {
 
-	Vector biasVector, lastBiasUpdateVector;
+    /**
+     * List of perceptrons in this layer
+     */
+    public ArrayList<Perceptron> perceptrons;
 
-	private final ActivationFunction activationFunction;
+    /**
+     * Constructor
+     * @param count
+     * @param g
+     */
+    public Layer(int count, ActivationFunctionInterface g, double sensitivity) {
+        // setup
+        this.perceptrons = new ArrayList<Perceptron>();
+        // create perceptrons
+        for (int i = 0; i < count; i++) {
+            this.perceptrons.add(new Perceptron(g, sensitivity));
+        }
+    }
 
-	private Vector lastActivationValues, lastInducedField;
+    /**
+     * Connects a layer to another layer; every perceptron is connected to every
+     * perceptron in the next layer
+     * @param downstream
+     */
+    public void connectTo(Layer downstream) {
+        for (Perceptron a : this.perceptrons) {
+            for (Perceptron b : downstream.perceptrons) {
+                a.addOutput(b);
+            }
+        }
+    }
 
-	private Matrix lastWeightUpdateMatrix;
+    /**
+     * Sends initial input data into the network
+     * @param input
+     * @throws SizeDifferenceException
+     */
+    public void in(DataList input) throws SizeDifferenceException, WrongSizeException {
+        if (input.size() != this.size()) {
+            throw new SizeDifferenceException("Dataset size (" + input.size() + ") and Layer size (" + this.size() + ") do not match");
+        }
+        // send to perceptrons
+        for (int i = 0; i < this.perceptrons.size(); i++) {
+            this.perceptrons.get(i).in(input.get(i));
+        }
+    }
 
-	private Matrix penultimateWeightUpdateMatrix;
+    /**
+     * Receives final output data from the network
+     * @return
+     */
+    public DataList out() {
+        DataList output = new DataList(this.perceptrons.size());
+        // wait until all processing is complete
+        boolean complete;
+        do {
+            complete = true;
+            for (int i = 0; i < this.perceptrons.size(); i++) {
+                if (!this.perceptrons.get(i).isComplete()) {
+                    complete = false;
+                }
+            }
+        } while (!complete);
+        // get values
+        for (Perceptron p : this.perceptrons) {
+            output.add(p.result);
+        }
+        // return
+        return output;
+    }
 
-	private Vector penultimateBiasUpdateVector;
+    /**
+     * Backpropagates errors from the given correct result
+     * @param expected_output
+     * @throws SizeDifferenceException a
+     */
+    public void backpropagate(DataList expected_output) throws SizeDifferenceException {
+        if (expected_output.size() != this.size()) {
+            throw new SizeDifferenceException("Data size (" + expected_output.size() + ") and Layer size (" + this.size() + ") do not match");
+        }
+        // send to upstream perceptrons
+        for (int i = 0; i < this.perceptrons.size(); i++) {
+            this.perceptrons.get(i).backpropagate_in(expected_output.get(i));
+        }
+    }
 
-	private Vector lastInput;
+    /**
+     * Returns the number of perceptrons in this layer
+     * @return
+     */
+    public int size() {
+        return this.perceptrons.size();
+    }
 
-	public Layer(Matrix weightMatrix, Vector biasVector, ActivationFunction af) {
+    /**
+     * Makes the layer Iterable
+     * @return
+     */
+    public LayerIterator iterator() {
+        return new LayerIterator();
+    }
 
-		activationFunction = af;
-		this.weightMatrix = weightMatrix;
-		lastWeightUpdateMatrix = new Matrix(weightMatrix.getRowDimension(),
-				weightMatrix.getColumnDimension());
-		penultimateWeightUpdateMatrix = new Matrix(
-				weightMatrix.getRowDimension(),
-				weightMatrix.getColumnDimension());
+    /**
+     * Iterator for the layer
+     */
+    private class LayerIterator implements Iterator<Perceptron> {
 
-		this.biasVector = biasVector;
-		lastBiasUpdateVector = new Vector(biasVector.getRowDimension());
-		penultimateBiasUpdateVector = new Vector(biasVector.getRowDimension());
-	}
+        /**
+         * Tracks the location in the list
+         */
+        private int index = 0;
 
-	public Layer(int numberOfNeurons, int numberOfInputs,
-			double lowerLimitForWeights, double upperLimitForWeights,
-			ActivationFunction af) {
+        /**
+         * Checks whether the list is empty or ended
+         * @return
+         */
+        public boolean hasNext() {
+            return (this.index < Layer.this.perceptrons.size());
+        }
 
-		activationFunction = af;
-		this.weightMatrix = new Matrix(numberOfNeurons, numberOfInputs);
-		lastWeightUpdateMatrix = new Matrix(weightMatrix.getRowDimension(),
-				weightMatrix.getColumnDimension());
-		penultimateWeightUpdateMatrix = new Matrix(
-				weightMatrix.getRowDimension(),
-				weightMatrix.getColumnDimension());
+        /**
+         * Returns the next element
+         * @return
+         */
+        public Perceptron next() {
+            if (!this.hasNext()) {
+                throw new NoSuchElementException();
+            }
+            Perceptron next = Layer.this.perceptrons.get(this.index);
+            this.index++;
+            return next;
+        }
 
-		this.biasVector = new Vector(numberOfNeurons);
-		lastBiasUpdateVector = new Vector(biasVector.getRowDimension());
-		penultimateBiasUpdateVector = new Vector(biasVector.getRowDimension());
-
-		initializeMatrix(weightMatrix, lowerLimitForWeights,
-				upperLimitForWeights);
-		initializeVector(biasVector, lowerLimitForWeights, upperLimitForWeights);
-	}
-
-	public Vector feedForward(Vector inputVector) {
-		lastInput = inputVector;
-		Matrix inducedField = weightMatrix.times(inputVector).plus(biasVector);
-
-		Vector inducedFieldVector = new Vector(numberOfNeurons());
-		for (int i = 0; i < numberOfNeurons(); i++) {
-			inducedFieldVector.setValue(i, inducedField.get(i, 0));
-		}
-
-		lastInducedField = inducedFieldVector.copyVector();
-		Vector resultVector = new Vector(numberOfNeurons());
-		for (int i = 0; i < numberOfNeurons(); i++) {
-			resultVector.setValue(i, activationFunction
-					.activation(inducedFieldVector.getValue(i)));
-		}
-		// set the result as the last activation value
-		lastActivationValues = resultVector.copyVector();
-		return resultVector;
-	}
-
-	public Matrix getWeightMatrix() {
-		return weightMatrix;
-	}
-
-	public Vector getBiasVector() {
-		return biasVector;
-	}
-
-	public int numberOfNeurons() {
-		return weightMatrix.getRowDimension();
-	}
-
-	public int numberOfInputs() {
-		return weightMatrix.getColumnDimension();
-	}
-
-	public Vector getLastActivationValues() {
-		return lastActivationValues;
-	}
-
-	public Vector getLastInducedField() {
-		return lastInducedField;
-	}
-
-	public Matrix getLastWeightUpdateMatrix() {
-		return lastWeightUpdateMatrix;
-	}
-
-	public void setLastWeightUpdateMatrix(Matrix m) {
-		lastWeightUpdateMatrix = m;
-	}
-
-	public Matrix getPenultimateWeightUpdateMatrix() {
-		return penultimateWeightUpdateMatrix;
-	}
-
-	public void setPenultimateWeightUpdateMatrix(Matrix m) {
-		penultimateWeightUpdateMatrix = m;
-	}
-
-	public Vector getLastBiasUpdateVector() {
-		return lastBiasUpdateVector;
-	}
-
-	public void setLastBiasUpdateVector(Vector v) {
-		lastBiasUpdateVector = v;
-	}
-
-	public Vector getPenultimateBiasUpdateVector() {
-		return penultimateBiasUpdateVector;
-	}
-
-	public void setPenultimateBiasUpdateVector(Vector v) {
-		penultimateBiasUpdateVector = v;
-	}
-
-	public void updateWeights() {
-		weightMatrix.plusEquals(lastWeightUpdateMatrix);
-	}
-
-	public void updateBiases() {
-		Matrix biasMatrix = biasVector.plusEquals(lastBiasUpdateVector);
-		Vector result = new Vector(biasMatrix.getRowDimension());
-		for (int i = 0; i < biasMatrix.getRowDimension(); i++) {
-			result.setValue(i, biasMatrix.get(i, 0));
-		}
-		biasVector = result;
-	}
-
-	public Vector getLastInputValues() {
-
-		return lastInput;
-
-	}
-
-	public ActivationFunction getActivationFunction() {
-
-		return activationFunction;
-	}
-
-	public void acceptNewWeightUpdate(Matrix weightUpdate) {
-		/*
-		 * penultimate weightupdates maintained only to implement VLBP later
-		 */
-		setPenultimateWeightUpdateMatrix(getLastWeightUpdateMatrix());
-		setLastWeightUpdateMatrix(weightUpdate);
-	}
-
-	public void acceptNewBiasUpdate(Vector biasUpdate) {
-		setPenultimateBiasUpdateVector(getLastBiasUpdateVector());
-		setLastBiasUpdateVector(biasUpdate);
-	}
-
-	public Vector errorVectorFrom(Vector target) {
-		return target.minus(getLastActivationValues());
-
-	}
-
-	//
-	// PRIVATE METHODS
-	//
-	private static void initializeMatrix(Matrix aMatrix, double lowerLimit,
-			double upperLimit) {
-		for (int i = 0; i < aMatrix.getRowDimension(); i++) {
-			for (int j = 0; j < aMatrix.getColumnDimension(); j++) {
-				double random = Util.generateRandomDoubleBetween(lowerLimit,
-						upperLimit);
-				aMatrix.set(i, j, random);
-			}
-		}
-
-	}
-
-	private static void initializeVector(Vector aVector, double lowerLimit,
-			double upperLimit) {
-		for (int i = 0; i < aVector.size(); i++) {
-
-			double random = Util.generateRandomDoubleBetween(lowerLimit,
-					upperLimit);
-			aVector.setValue(i, random);
-		}
-	}
+        /**
+         * Removes an element; not supported in this implementation
+         */
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
 }
