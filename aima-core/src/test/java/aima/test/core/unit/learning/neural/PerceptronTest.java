@@ -1,9 +1,10 @@
-package aima.core.learning.neural;
+package aima.test.core.unit.learning.neural;
 
 import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import aima.core.learning.neural.*;
 
 /**
  * Tests perceptron functionality
@@ -61,14 +62,14 @@ public class PerceptronTest {
         double actual = this.p.outputs.get(5).result;
         assertEquals(expected, actual, 0.0);
     }
-    
+
     /**
      * Demonstrates training a single perceptron; training for 0.1 results
      * in far more iterations than training for 0.9 below; TODO
      * @throws WrongSizeException 
      */
     @Test
-    public void testBackpropagationLow() throws WrongSizeException{
+    public void testBackpropagationLow() throws WrongSizeException {
         Perceptron input = new Perceptron(new ActivationFunctionPureLinear(), 1.0);
         Perceptron output = new Perceptron(new ActivationFunctionPureLinear(), 1.0);
         input.addOutput(output);
@@ -76,24 +77,24 @@ public class PerceptronTest {
         double expected = 0.1;
         double actual = 0.0;
         int count = 0;
-        while( Math.abs(expected - actual) > 0.00001 ){
+        while (Math.abs(expected - actual) > 0.00001) {
             count++;
             input.in(expected);
             actual = output.result;
             output.backpropagate_in(expected);
         }
         // test
-        System.out.println("After "+count+" training iterations.");
+        System.out.println("After " + count + " training iterations.");
         assertEquals(expected, actual, 0.0001);
     }
-    
+
     /**
      * Demonstrates training a single perceptron; use of 0.9 is much faster
      * than above
      * @throws WrongSizeException 
      */
     @Test
-    public void testBackpropagationHigh() throws WrongSizeException{
+    public void testBackpropagationHigh() throws WrongSizeException {
         Perceptron input = new Perceptron(new ActivationFunctionPureLinear(), 1.0);
         Perceptron output = new Perceptron(new ActivationFunctionPureLinear(), 1.0);
         input.addOutput(output);
@@ -101,14 +102,14 @@ public class PerceptronTest {
         double expected = 0.9;
         double actual = 0.0;
         int count = 0;
-        while( Math.abs(expected - actual) > 0.00001 ){
+        while (Math.abs(expected - actual) > 0.00001) {
             count++;
             input.in(expected);
             actual = output.result;
             output.backpropagate_in(expected);
         }
         // test
-        System.out.println("After "+count+" training iterations.");
+        System.out.println("After " + count + " training iterations.");
         assertEquals(expected, actual, 0.0001);
     }
 }

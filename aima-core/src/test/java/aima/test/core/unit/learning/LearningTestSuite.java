@@ -10,8 +10,8 @@ import aima.test.core.unit.learning.inductive.DecisionListTest;
 import aima.test.core.unit.learning.learners.DecisionTreeTest;
 import aima.test.core.unit.learning.learners.EnsembleLearningTest;
 import aima.test.core.unit.learning.learners.LearnerTests;
-import aima.test.core.unit.learning.neural.BackPropagationTests;
-import aima.test.core.unit.learning.neural.LayerTests;
+import aima.test.core.unit.learning.neural.NeuralNetworkTest;
+import aima.test.core.unit.learning.neural.PerceptronTest;
 import aima.test.core.unit.learning.reinforcement.agent.PassiveADPAgentTest;
 import aima.test.core.unit.learning.reinforcement.agent.PassiveTDAgentTest;
 import aima.test.core.unit.learning.reinforcement.agent.QLearningAgentTest;
@@ -20,7 +20,7 @@ import aima.test.core.unit.learning.reinforcement.agent.QLearningAgentTest;
 @Suite.SuiteClasses({ DataSetTest.class, InformationAndGainTest.class,
 		DecisionListTest.class, DLTestTest.class, DecisionTreeTest.class,
 		EnsembleLearningTest.class, LearnerTests.class,
-		BackPropagationTests.class, LayerTests.class,
+		NeuralNetworkTest.class, PerceptronTest.class,
 		PassiveADPAgentTest.class, PassiveTDAgentTest.class,
 		QLearningAgentTest.class })
 public class LearningTestSuite {

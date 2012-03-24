@@ -1,9 +1,10 @@
-package aima.core.learning.neural;
+package aima.test.core.unit.learning.neural;
 
 import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import aima.core.learning.neural.*;
 
 /**
  * Tests neural network functionality

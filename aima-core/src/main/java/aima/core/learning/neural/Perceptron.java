@@ -12,16 +12,16 @@ import java.util.NoSuchElementException;
  */
 public class Perceptron implements Iterable, Serializable {
 
-    ArrayList<Perceptron> inputs;
-    ArrayList<Perceptron> outputs;
-    HashMap<Perceptron, Double> weights;
-    HashMap<Perceptron, Double> activation;
-    HashMap<Perceptron, Double> error;
-    ActivationFunctionInterface function;
-    double bias;
-    double result;
-    double sensitivity;
-    byte state;
+    public ArrayList<Perceptron> inputs;
+    public ArrayList<Perceptron> outputs;
+    public HashMap<Perceptron, Double> weights;
+    public HashMap<Perceptron, Double> activation;
+    public HashMap<Perceptron, Double> error;
+    public ActivationFunctionInterface function;
+    public double bias;
+    public double result;
+    public double sensitivity;
+    public byte state;
 
     /**
      * Constructor
