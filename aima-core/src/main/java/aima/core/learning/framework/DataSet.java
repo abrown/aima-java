@@ -1,6 +1,6 @@
 package aima.core.learning.framework;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class DataSet {
 
 	public double getInformationFor() {
 		String attributeName = specification.getTarget();
-		Hashtable<String, Integer> counts = new Hashtable<String, Integer>();
+		HashMap<String, Integer> counts = new HashMap<String, Integer>();
 		for (Example e : examples) {
 
 			String val = e.getAttributeValueAsString(attributeName);
@@ -70,8 +70,8 @@ public class DataSet {
 		return Util.information(data);
 	}
 
-	public Hashtable<String, DataSet> splitByAttribute(String attributeName) {
-		Hashtable<String, DataSet> results = new Hashtable<String, DataSet>();
+	public HashMap<String, DataSet> splitByAttribute(String attributeName) {
+		HashMap<String, DataSet> results = new HashMap<String, DataSet>();
 		for (Example e : examples) {
 			String val = e.getAttributeValueAsString(attributeName);
 			if (results.containsKey(val)) {
@@ -86,7 +86,7 @@ public class DataSet {
 	}
 
 	public double calculateGainFor(String parameterName) {
-		Hashtable<String, DataSet> hash = splitByAttribute(parameterName);
+		HashMap<String, DataSet> hash = splitByAttribute(parameterName);
 		double totalSize = examples.size();
 		double remainder = 0.0;
 		for (String parameterValue : hash.keySet()) {

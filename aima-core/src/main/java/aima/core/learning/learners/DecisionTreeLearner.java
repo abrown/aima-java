@@ -2,7 +2,6 @@ package aima.core.learning.learners;
 
 import java.util.Iterator;
 import java.util.List;
-
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;

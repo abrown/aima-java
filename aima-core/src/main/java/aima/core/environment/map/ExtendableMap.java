@@ -1,7 +1,7 @@
 package aima.core.environment.map;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import aima.core.util.Util;
@@ -27,12 +27,12 @@ public class ExtendableMap implements Map {
 	private final LabeledGraph<String, Double> links;
 
 	/** Stores xy-coordinates for each location. */
-	private final Hashtable<String, Point2D> locationPositions;
+	private final HashMap<String, Point2D> locationPositions;
 
 	/** Creates an empty map. */
 	public ExtendableMap() {
 		links = new LabeledGraph<String, Double>();
-		locationPositions = new Hashtable<String, Point2D>();
+		locationPositions = new HashMap<String, Point2D>();
 	}
 
 	/** Removes everything. */

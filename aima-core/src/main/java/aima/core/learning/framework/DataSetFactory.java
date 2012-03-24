@@ -3,7 +3,7 @@ package aima.core.learning.framework;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +33,7 @@ public class DataSetFactory {
 
 	public static Example exampleFromString(String data,
 			DataSetSpecification dataSetSpec, String separator) {
-		Hashtable<String, Attribute> attributes = new Hashtable<String, Attribute>();
+		HashMap<String, Attribute> attributes = new HashMap<String, Attribute>();
 		List<String> attributeValues = Arrays.asList(data.split(separator));
 		if (dataSetSpec.isValid(attributeValues)) {
 			List<String> names = dataSetSpec.getAttributeNames();

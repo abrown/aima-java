@@ -1,6 +1,6 @@
 package aima.core.search.framework;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -9,10 +9,10 @@ import java.util.Set;
  * @author Ruediger Lunde
  */
 public class Metrics {
-	private Hashtable<String, String> hash;
+	private HashMap<String, String> hash;
 
 	public Metrics() {
-		this.hash = new Hashtable<String, String>();
+		this.hash = new HashMap<String, String>();
 	}
 
 	public void set(String name, int i) {

@@ -1,6 +1,6 @@
 package aima.core.learning.learners;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import aima.core.learning.framework.DataSet;
@@ -21,7 +21,7 @@ public class AdaBoostLearner implements Learner {
 
 	private double[] exampleWeights;
 
-	private Hashtable<Learner, Double> learnerWeights;
+	private HashMap<Learner, Double> learnerWeights;
 
 	public AdaBoostLearner(List<Learner> learners, DataSet ds) {
 		this.learners = learners;
@@ -141,7 +141,7 @@ public class AdaBoostLearner implements Learner {
 					"cannot initialize Ensemble learning with Zero Learners");
 		}
 
-		learnerWeights = new Hashtable<Learner, Double>();
+		learnerWeights = new HashMap<Learner, Double>();
 		for (Learner le : learners) {
 			learnerWeights.put(le, 1.0);
 		}
