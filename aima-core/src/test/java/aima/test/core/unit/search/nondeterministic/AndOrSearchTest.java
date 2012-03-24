@@ -56,6 +56,24 @@ public class AndOrSearchTest {
     }
 
     @Test
+    public void testEquality() {
+        // create state 1
+        VacuumEnvironmentState s1 = new VacuumEnvironmentState();
+        s1.setLocationState(VacuumEnvironment.LOCATION_A, VacuumEnvironment.LocationState.Dirty);
+        s1.setLocationState(VacuumEnvironment.LOCATION_B, VacuumEnvironment.LocationState.Dirty);
+        s1.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_A);
+        // create state 2
+        VacuumEnvironmentState s2 = new VacuumEnvironmentState();
+        s2.setLocationState(VacuumEnvironment.LOCATION_A, VacuumEnvironment.LocationState.Dirty);
+        s2.setLocationState(VacuumEnvironment.LOCATION_B, VacuumEnvironment.LocationState.Dirty);
+        s2.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_A);
+        // test
+        boolean expected = true;
+        boolean actual = s1.equals(s2);
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
     public void testSearch() {
         AndOrSearch s = new AndOrSearch();
         try {
@@ -174,49 +192,53 @@ class VacuumWorldResults implements ResultsFunction {
         Set<Object> results = new HashSet<Object>();
         String current_location = state.getAgentLocation(agent);
         String adjacent_location = (current_location.equals(VacuumEnvironment.LOCATION_A)) ? VacuumEnvironment.LOCATION_B : VacuumEnvironment.LOCATION_A;
-        // actions
-        if (action.equals(VacuumEnvironment.ACTION_SUCK)) {
+        //
+        if (VacuumEnvironment.ACTION_MOVE_RIGHT == action) {
+            VacuumEnvironmentState s = new VacuumEnvironmentState();
+            s.setLocationState(current_location, state.getLocationState(current_location));
+            s.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
+            s.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_B);
+            results.add(s);
+        } else if (VacuumEnvironment.ACTION_MOVE_LEFT == action) {
+            VacuumEnvironmentState s = new VacuumEnvironmentState();
+            s.setLocationState(current_location, state.getLocationState(current_location));
+            s.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
+            s.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_B);
+            results.add(s);
+        } else if (VacuumEnvironment.ACTION_SUCK == action) {
             // case: square is dirty
-            if (VacuumEnvironment.LocationState.Dirty == state.getLocationState(current_location)) {
+            if (VacuumEnvironment.LocationState.Dirty == state.getLocationState(state.getAgentLocation(this.agent))) {
                 // always clean current
                 VacuumEnvironmentState s1 = new VacuumEnvironmentState();
                 s1.setLocationState(current_location, VacuumEnvironment.LocationState.Clean);
                 s1.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
+                s1.setAgentLocation(this.agent, current_location);
                 results.add(s1);
                 // sometimes clean adjacent as well
                 VacuumEnvironmentState s2 = new VacuumEnvironmentState();
                 s2.setLocationState(current_location, VacuumEnvironment.LocationState.Clean);
                 s2.setLocationState(adjacent_location, VacuumEnvironment.LocationState.Clean);
+                s2.setAgentLocation(this.agent, current_location);
                 results.add(s2);
             } // case: square is clean
             else {
                 // sometimes do nothing
-                VacuumEnvironmentState s3 = new VacuumEnvironmentState();
-                s3.setLocationState(current_location, state.getLocationState(current_location));
-                s3.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
-                results.add(s3);
+                VacuumEnvironmentState s1 = new VacuumEnvironmentState();
+                s1.setLocationState(current_location, state.getLocationState(current_location));
+                s1.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
+                s1.setAgentLocation(this.agent, current_location);
+                results.add(s1);
                 // sometimes deposit dirt
-                VacuumEnvironmentState s4 = new VacuumEnvironmentState();
-                s4.setLocationState(current_location, VacuumEnvironment.LocationState.Dirty);
-                s4.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
-                results.add(s4);
+                VacuumEnvironmentState s2 = new VacuumEnvironmentState();
+                s2.setLocationState(current_location, VacuumEnvironment.LocationState.Dirty);
+                s2.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
+                s2.setAgentLocation(this.agent, current_location);
+                results.add(s2);
             }
-        } else if (action.equals(VacuumEnvironment.ACTION_MOVE_LEFT)) {
-            VacuumEnvironmentState s5 = new VacuumEnvironmentState();
-            s5.setLocationState(current_location, state.getLocationState(current_location));
-            s5.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
-            s5.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_A);
-            results.add(s5);
-        } else if (action.equals(VacuumEnvironment.ACTION_MOVE_RIGHT)) {
-            VacuumEnvironmentState s6 = new VacuumEnvironmentState();
-            s6.setLocationState(current_location, state.getLocationState(current_location));
-            s6.setLocationState(adjacent_location, state.getLocationState(adjacent_location));
-            s6.setAgentLocation(this.agent, VacuumEnvironment.LOCATION_B);
-            results.add(s6);
-        } else {
+        } else if (action.isNoOp()) {
             // do nothing
         }
-        // return
+
         return results;
     }
 }
@@ -245,15 +267,15 @@ class VacuumWorldGoalTest implements GoalTest {
     public boolean isGoalState(Object _state) {
         // setup
         VacuumEnvironmentState state = (VacuumEnvironmentState) _state;
-        System.out.println(state);
         String current_location = state.getAgentLocation(this.agent);
         String adjacent_location = (current_location.equals(VacuumEnvironment.LOCATION_A)) ? VacuumEnvironment.LOCATION_B : VacuumEnvironment.LOCATION_A;
-        // 
-        if (VacuumEnvironment.LocationState.Clean == state.getLocationState(current_location)
-                && VacuumEnvironment.LocationState.Clean == state.getLocationState(adjacent_location)) {
-            return true;
-        } else {
+        // test goal state
+        if (VacuumEnvironment.LocationState.Clean != state.getLocationState(current_location)) {
             return false;
+        } else if (VacuumEnvironment.LocationState.Clean != state.getLocationState(adjacent_location)) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
