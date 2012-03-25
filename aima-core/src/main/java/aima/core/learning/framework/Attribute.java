@@ -55,6 +55,20 @@ public class Attribute<E> {
     }
 
     /**
+     * Sets the attribute value auto-magically from a String to the generic
+     * type.
+     * @param value 
+     */
+    public void setValue(String value) {
+        try {
+            Class type = this.value.getClass();
+            this.value = (E) type.getDeclaredConstructor(String.class).newInstance(value);
+        } catch (Exception e) {
+            this.value = null;
+        }
+    }
+
+    /**
      * Returns the attribute value
      * @return 
      */
@@ -75,12 +89,12 @@ public class Attribute<E> {
             return false;
         }
     }
-    
+
     /**
      * Returns a string representation of the value of this attribute
      * @return 
      */
-    public String toString(){
+    public String toString() {
         return this.value.toString();
     }
 }
