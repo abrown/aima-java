@@ -2,9 +2,8 @@ package aima.core.learning.framework;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import aima.core.util.Util;
+import java.util.ArrayList;
 
 /**
  * Provides methods for representing a set of learning examples
@@ -13,27 +12,13 @@ import aima.core.util.Util;
  */
 public class DataSet {
 
-    public List<Example> examples;
-    
-    /**
-     * @todo explain this
-     */
-    public DataSetSpecification specification;
-    
+    public ArrayList<Example> examples;
+
     /**
      * Constructor
      */
     protected DataSet() {
-        examples = new LinkedList<Example>();
-    }
-
-    /**
-     * Constructor
-     * @param spec 
-     */
-    public DataSet(DataSetSpecification spec) {
-        examples = new LinkedList<Example>();
-        this.specification = spec;
+        examples = new ArrayList<Example>();
     }
 
     /**
@@ -63,11 +48,12 @@ public class DataSet {
 
     /**
      * Removes the example given from the data set
+     * @todo remove this
      * @param e
      * @return 
      */
-    public DataSet removeExample(Example e) {
-        DataSet ds = new DataSet(specification);
+    public DataSet remove(Example e) {
+        DataSet ds = new DataSet();
         for (Example eg : examples) {
             if (!(e.equals(eg))) {
                 ds.add(eg);
@@ -81,8 +67,7 @@ public class DataSet {
      * @todo explain better...
      * @return 
      */
-    public double getInformationFor() {
-        String attributeName = specification.getTarget();
+    public double getInformationFor(String attributeName) {
         HashMap<String, Integer> counts = new HashMap<String, Integer>();
         for (Example e : examples) {
             String val = e.getAttributeValueAsString(attributeName);
@@ -113,29 +98,12 @@ public class DataSet {
             if (results.containsKey(val)) {
                 results.get(val).add(e);
             } else {
-                DataSet ds = new DataSet(specification);
+                DataSet ds = new DataSet();
                 ds.add(e);
                 results.put(val, ds);
             }
         }
         return results;
-    }
-
-    /**
-     * @todo explain better
-     * @param parameterName
-     * @return 
-     */
-    public double calculateGainFor(String parameterName) {
-        HashMap<String, DataSet> hash = splitByAttribute(parameterName);
-        double totalSize = examples.size();
-        double remainder = 0.0;
-        for (String parameterValue : hash.keySet()) {
-            double reducedDataSetSize = hash.get(parameterValue).examples.size();
-            remainder += (reducedDataSetSize / totalSize)
-                    * hash.get(parameterValue).getInformationFor();
-        }
-        return getInformationFor() - remainder;
     }
 
     /**
@@ -177,82 +145,98 @@ public class DataSet {
      * @return 
      */
     public DataSet copy() {
-        DataSet ds = new DataSet(specification);
+        DataSet ds = new DataSet();
         for (Example e : examples) {
             ds.add(e);
         }
         return ds;
     }
 
-    /**
-     * Returns the attribute names
-     * @return 
-     */
-    public List<String> getAttributeNames() {
-        return specification.getAttributeNames();
-    }
-
-    /**
-     * Returns the target attribute name
-     * @return 
-     */
-    public String getTargetAttributeName() {
-        return specification.getTarget();
-    }
-
-    /**
-     * Returns a new empty data set
-     * @todo move to factory
-     * @return 
-     */
-    public DataSet emptyDataSet() {
-        return new DataSet(specification);
-    }
-
-    /**
-     * Sets the specification for this object
-     * @todo remove this
-     * @param specification the specification to set. USE SPARINGLY for testing 
-     * etc .. makes no semantic sense
-     */
-    public void setSpecification(DataSetSpecification specification) {
-        this.specification = specification;
-    }
-
-    /**
-     * Wrapper for specification.getPossibleAttributeValues()
-     * @todo remove this
-     * @param attributeName
-     * @return 
-     */
-    public List<String> getPossibleAttributeValues(String attributeName) {
-        return specification.getPossibleAttributeValues(attributeName);
-    }
-
-    /**
-     * Filters the set, returning only the results that match the given 
-     * attribute name and value
-     * @todo rename as filter()
-     * @param attributeName
-     * @param attributeValue
-     * @return 
-     */
-    public DataSet matchingDataSet(String attributeName, String attributeValue) {
-        DataSet ds = new DataSet(specification);
-        for (Example e : examples) {
-            if (e.getAttributeValueAsString(attributeName).equals(
-                    attributeValue)) {
-                ds.add(e);
-            }
-        }
-        return ds;
-    }
-
-    /**
-     * Returns all attributes that are not the target
-     * @return 
-     */
-    public List<String> getNonTargetAttributes() {
-        return Util.removeFrom(getAttributeNames(), getTargetAttributeName());
-    }
+//    /**
+//     * @todo explain better
+//     * @param parameterName
+//     * @return 
+//     */
+//    public double calculateGainFor(String parameterName) {
+//        HashMap<String, DataSet> hash = splitByAttribute(parameterName);
+//        double totalSize = examples.size();
+//        double remainder = 0.0;
+//        for (String parameterValue : hash.keySet()) {
+//            double reducedDataSetSize = hash.get(parameterValue).examples.size();
+//            remainder += (reducedDataSetSize / totalSize)
+//                    * hash.get(parameterValue).getInformationFor();
+//        }
+//        return getInformationFor() - remainder;
+//    }
+//    /**
+//     * Returns the attribute names
+//     * @return 
+//     */
+//    public List<String> getAttributeNames() {
+//        return specification.getAttributeNames();
+//    }
+//
+//    /**
+//     * Returns the target attribute name
+//     * @return 
+//     */
+//    public String getTargetAttributeName() {
+//        return specification.getTarget();
+//    }
+//
+//    /**
+//     * Returns a new empty data set
+//     * @todo move to factory
+//     * @return 
+//     */
+//    public DataSet emptyDataSet() {
+//        return new DataSet(specification);
+//    }
+//
+//    /**
+//     * Sets the specification for this object
+//     * @todo remove this
+//     * @param specification the specification to set. USE SPARINGLY for testing 
+//     * etc .. makes no semantic sense
+//     */
+//    public void setSpecification(DataSetSpecification specification) {
+//        this.specification = specification;
+//    }
+//
+//    /**
+//     * Wrapper for specification.getPossibleAttributeValues()
+//     * @todo remove this
+//     * @param attributeName
+//     * @return 
+//     */
+//    public List<String> getPossibleAttributeValues(String attributeName) {
+//        return specification.getPossibleAttributeValues(attributeName);
+//    }
+//
+//    /**
+//     * Filters the set, returning only the results that match the given 
+//     * attribute name and value
+//     * @todo rename as filter()
+//     * @param attributeName
+//     * @param attributeValue
+//     * @return 
+//     */
+//    public DataSet matchingDataSet(String attributeName, String attributeValue) {
+//        DataSet ds = new DataSet(specification);
+//        for (Example e : examples) {
+//            if (e.getAttributeValueAsString(attributeName).equals(
+//                    attributeValue)) {
+//                ds.add(e);
+//            }
+//        }
+//        return ds;
+//    }
+//
+//    /**
+//     * Returns all attributes that are not the target
+//     * @return 
+//     */
+//    public List<String> getNonTargetAttributes() {
+//        return Util.removeFrom(getAttributeNames(), getTargetAttributeName());
+//    }
 }

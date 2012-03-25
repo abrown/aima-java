@@ -31,8 +31,7 @@ public class DataSetFactory {
 
 	}
 
-	public static Example exampleFromString(String data,
-			DataSetSpecification dataSetSpec, String separator) {
+	public static Example exampleFromString(String data, String separator) {
 		HashMap<String, Attribute> attributes = new HashMap<String, Attribute>();
 		List<String> attributeValues = Arrays.asList(data.split(separator));
 		if (dataSetSpec.isValid(attributeValues)) {

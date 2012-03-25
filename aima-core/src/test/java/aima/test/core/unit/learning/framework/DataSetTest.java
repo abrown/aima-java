@@ -95,7 +95,7 @@ public class DataSetTest {
 	@Test
 	public void testNonDestructiveRemoveExample() throws Exception {
 		DataSet ds1 = DataSetFactory.getRestaurantDataSet();
-		DataSet ds2 = ds1.removeExample(ds1.getExample(0));
+		DataSet ds2 = ds1.remove(ds1.getExample(0));
 		Assert.assertEquals(12, ds1.size());
 		Assert.assertEquals(11, ds2.size());
 	}
