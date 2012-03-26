@@ -1,8 +1,6 @@
 package aima.core.learning.framework;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Represents a learning example; according to page 699, in a Boolean decision 
@@ -17,7 +15,7 @@ public class Example<E> {
     /**
      * The input attributes for this example
      */
-    List<Attribute> inputAttributes = new LinkedList<Attribute>();
+    ArrayList<Attribute> inputAttributes = new ArrayList<Attribute>();
     
     /**
      * The output value for this example
@@ -25,19 +23,27 @@ public class Example<E> {
     E outputValue;
     
     /**
-     * @todo remove this
+     * Constructor
      */
-    private Attribute targetAttribute;
-
+    public Example(){
+    }
+    
     /**
      * Constructor
-     * @param attributes
-     * @param targetAttribute 
+     * @param inputAttributes
+     * @param outputValue
      */
-    public Example(List<Attribute> attributes,
-            Attribute targetAttribute) {
-        this.inputAttributes = attributes;
-        this.targetAttribute = targetAttribute;
+    public Example(ArrayList<Attribute> inputAttributes, E outputValue){
+        this.inputAttributes = inputAttributes;
+        this.outputValue = outputValue;
+    }
+    
+    /**
+     * Adds an attribute to this example
+     * @param attribute 
+     */
+    public void add(Attribute attribute){
+        this.inputAttributes.add(attribute);
     }
     
     /**
@@ -53,29 +59,6 @@ public class Example<E> {
     }
 
     /**
-     * @todo replace this with get(attributeName).getValue();
-     * @param attributeName
-     * @return 
-     */
-    public String getAttributeValueAsString(String attributeName) {
-        return inputAttributes.get(attributeName).valueAsString();
-    }
-
-    /**
-     * @todo replace this with get(attributeName).getValue();
-     * @param attributeName
-     * @return 
-     */
-    public double getAttributeValueAsDouble(String attributeName) {
-        Attribute attribute = inputAttributes.get(attributeName);
-        if (attribute == null || !(attribute instanceof NumericAttribute)) {
-            throw new RuntimeException(
-                    "cannot return numerical value for non numeric attribute");
-        }
-        return ((NumericAttribute) attribute).valueAsDouble();
-    }
-
-    /**
      * Returns string representation
      * @return 
      */
@@ -86,14 +69,6 @@ public class Example<E> {
         s.append(" --> ");
         s.append(outputValue);
         return s.toString();
-    }
-
-    /**
-     * @todo remove this
-     * @return 
-     */
-    public String targetValue() {
-        return getAttributeValueAsString(targetAttribute.name());
     }
 
     /**
@@ -120,30 +95,5 @@ public class Example<E> {
     @Override
     public int hashCode() {
         return inputAttributes.hashCode();
-    }
-
-    /**
-     * @todo remove this
-     * @param attrValueToNumber
-     * @return 
-     */
-    public Example numerize(
-            HashMap<String, HashMap<String, Integer>> attrValueToNumber) {
-        HashMap<String, Attribute> numerizedExampleData = new HashMap<String, Attribute>();
-        for (String key : inputAttributes.keySet()) {
-            Attribute attribute = inputAttributes.get(key);
-            if (attribute instanceof StringAttribute) {
-                int correspondingNumber = attrValueToNumber.get(key).get(
-                        attribute.valueAsString());
-                NumericAttributeSpecification spec = new NumericAttributeSpecification(
-                        key);
-                numerizedExampleData.put(key, new NumericAttribute(
-                        correspondingNumber, spec));
-            } else {// Numeric Attribute
-                numerizedExampleData.put(key, attribute);
-            }
-        }
-        return new Example(numerizedExampleData,
-                numerizedExampleData.get(targetAttribute.name()));
     }
 }
