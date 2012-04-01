@@ -14,112 +14,128 @@ import aima.core.learning.inductive.DecisionList;
  * @author Mike Stampone
  */
 public class DecisionListLearner implements Learner {
-	public static final String FAILURE = "Failure";
 
-	private DecisionList decisionList;
+    public static final String FAILURE = "Failure";
+    private DecisionList decisionList;
+    private String positive, negative;
+    private DLTestFactory testFactory;
 
-	private String positive, negative;
+    public DecisionListLearner(String positive, String negative,
+            DLTestFactory testFactory) {
+        this.positive = positive;
+        this.negative = negative;
+        this.testFactory = testFactory;
+    }
 
-	private DLTestFactory testFactory;
+    //
+    // START-Learner
+    /**
+     * Induces the decision list from the specified set of examples
+     * 
+     * @param ds
+     *            a set of examples for constructing the decision list
+     */
+    @Override
+    public void train(DataSet ds) {
+        this.decisionList = decisionListLearning(ds);
+    }
 
-	public DecisionListLearner(String positive, String negative,
-			DLTestFactory testFactory) {
-		this.positive = positive;
-		this.negative = negative;
-		this.testFactory = testFactory;
-	}
+    @Override
+    public String predict(Example e) {
+        if (decisionList == null) {
+            throw new RuntimeException(
+                    "learner has not been trained with dataset yet!");
+        }
+        return decisionList.predict(e);
+    }
 
-	//
-	// START-Learner
+    @Override
+    public int[] test(DataSet ds) {
+        int[] results = new int[]{0, 0};
 
-	/**
-	 * Induces the decision list from the specified set of examples
-	 * 
-	 * @param ds
-	 *            a set of examples for constructing the decision list
-	 */
-	@Override
-	public void train(DataSet ds) {
-		this.decisionList = decisionListLearning(ds);
-	}
+        for (Example e : ds.examples) {
+            if (e.targetValue().equals(decisionList.predict(e))) {
+                results[0] = results[0] + 1;
+            } else {
+                results[1] = results[1] + 1;
+            }
+        }
+        return results;
+    }
 
-	@Override
-	public String predict(Example e) {
-		if (decisionList == null) {
-			throw new RuntimeException(
-					"learner has not been trained with dataset yet!");
-		}
-		return decisionList.predict(e);
-	}
+    // END-Learner
+    //
+    /**
+     * Returns the decision list of this decision list learner
+     * 
+     * @return the decision list of this decision list learner
+     */
+    public DecisionList getDecisionList() {
+        return decisionList;
+    }
 
-	@Override
-	public int[] test(DataSet ds) {
-		int[] results = new int[] { 0, 0 };
+    //
+    // PRIVATE METHODS
+    //
+    private DecisionList decisionListLearning(DataSet ds) {
+        if (ds.size() == 0) {
+            return new DecisionList();
+        }
+        List<DecisionListTest> possibleTests = testFactory.createDLTestsWithAttributeCount(ds, 1);
+        DecisionListTest test = getValidTest(possibleTests, ds);
+        if (test == null) {
+            return new DecisionList();
+        }
+        // at this point there is a test that classifies some subset of examples
+        // with the same target value
+        DataSet matched = test.getMatchingExamples(ds);
+        DecisionList list = new DecisionList();
+        list.add(test, matched.getExample(0).targetValue());
+        return list.mergeWith(decisionListLearning(test.getNonMatchingExamples(ds)));
+    }
 
-		for (Example e : ds.examples) {
-			if (e.targetValue().equals(decisionList.predict(e))) {
-				results[0] = results[0] + 1;
-			} else {
-				results[1] = results[1] + 1;
-			}
-		}
-		return results;
-	}
+    private DecisionListTest getValidTest(List<DecisionListTest> possibleTests, DataSet ds) {
+        for (DecisionListTest test : possibleTests) {
+            DataSet matched = test.getMatchingExamples(ds);
+            if (!(matched.size() == 0)) {
+                if (allExamplesHaveSameTargetValue(matched)) {
+                    return test;
+                }
+            }
 
-	// END-Learner
-	//
+        }
+        return null;
+    }
 
-	/**
-	 * Returns the decision list of this decision list learner
-	 * 
-	 * @return the decision list of this decision list learner
-	 */
-	public DecisionList getDecisionList() {
-		return decisionList;
-	}
+    private boolean allExamplesHaveSameTargetValue(DataSet matched) {
+        // assumes at least i example in dataset
+        String targetValue = matched.getExample(0).targetValue();
+        for (Example e : matched.examples) {
+            if (!(e.targetValue().equals(targetValue))) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	//
-	// PRIVATE METHODS
-	//
-	private DecisionList decisionListLearning(DataSet ds) {
-		if (ds.size() == 0) {
-			return new DecisionList();
-		}
-		List<DecisionListTest> possibleTests = testFactory
-				.createDLTestsWithAttributeCount(ds, 1);
-		DecisionListTest test = getValidTest(possibleTests, ds);
-		if (test == null) {
-			return new DecisionList();
-		}
-		// at this point there is a test that classifies some subset of examples
-		// with the same target value
-		DataSet matched = test.getMatchingExamples(ds);
-		DecisionList list = new DecisionList();
-		list.add(test, matched.getExample(0).targetValue());
-		return list.mergeWith(decisionListLearning(test.getNonMatchingExamples(ds)));
-	}
+    public List<DecisionListTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
+        if (i != 1) {
+            throw new RuntimeException(
+                    "For now DLTests with only 1 attribute can be craeted , not"
+                    + i);
+        }
+        List<String> nonTargetAttributes = ds.getNonTargetAttributes();
+        List<DecisionListTest> tests = new ArrayList<DecisionListTest>();
+        for (String ntAttribute : nonTargetAttributes) {
+            List<String> ntaValues = ds.getPossibleAttributeValues(ntAttribute);
+            for (String ntaValue : ntaValues) {
 
-	private DecisionListTest getValidTest(List<DecisionListTest> possibleTests, DataSet ds) {
-		for (DecisionListTest test : possibleTests) {
-			DataSet matched = test.getMatchingExamples(ds);
-			if (!(matched.size() == 0)) {
-				if (allExamplesHaveSameTargetValue(matched)) {
-					return test;
-				}
-			}
+                DecisionListTest test = new DecisionListTest();
+                test.add(ntAttribute, ntaValue);
+                tests.add(test);
 
-		}
-		return null;
-	}
-
-	private boolean allExamplesHaveSameTargetValue(DataSet matched) {
-		// assumes at least i example in dataset
-		String targetValue = matched.getExample(0).targetValue();
-		for (Example e : matched.examples) {
-			if (!(e.targetValue().equals(targetValue))) {
-				return false;
-			}
-		}
-		return true;
-	}
+            }
+        }
+        return tests;
+    }
 }
