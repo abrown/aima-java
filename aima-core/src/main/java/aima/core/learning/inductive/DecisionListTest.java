@@ -87,7 +87,7 @@ public class DecisionListTest {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append("[IF ");
+        s.append("[");
         if( this.conjuncts.size() > 0 ){
             Attribute last = this.conjuncts.peekLast();
             for (Attribute conjunct : this.conjuncts) {
@@ -98,10 +98,10 @@ public class DecisionListTest {
             }
         }
         else{
-            s.append("true ");
+            s.append("true");
         }
         // decision
-        s.append(" THEN output(true) ELSE output(false)]");
+        s.append("]");
         // return
         return s.toString();
     }
