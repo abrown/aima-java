@@ -3,7 +3,7 @@ package aima.test.core.unit.learning.inductive;
 import java.util.List;
 
 import aima.core.learning.framework.DataSet;
-import aima.core.learning.inductive.DLTest;
+import aima.core.learning.inductive.DecisionListTest;
 import aima.core.learning.inductive.DLTestFactory;
 
 /**
@@ -12,14 +12,14 @@ import aima.core.learning.inductive.DLTestFactory;
  */
 public class MockDLTestFactory extends DLTestFactory {
 
-	private List<DLTest> tests;
+	private List<DecisionListTest> tests;
 
-	public MockDLTestFactory(List<DLTest> tests) {
+	public MockDLTestFactory(List<DecisionListTest> tests) {
 		this.tests = tests;
 	}
 
 	@Override
-	public List<DLTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
+	public List<DecisionListTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
 		return tests;
 	}
 }

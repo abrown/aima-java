@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.DataSetFactory;
-import aima.core.learning.inductive.DLTest;
+import aima.core.learning.inductive.DecisionListTest;
 import aima.core.learning.inductive.DLTestFactory;
 import aima.core.learning.learners.CurrentBestLearner;
 import aima.core.learning.learners.DecisionListLearner;
@@ -114,7 +114,7 @@ public class LearnerTests {
 			throws Exception {
 		// tests second base case of DL Learner
 		DecisionListLearner learner = new DecisionListLearner("Yes", "No",
-				new MockDLTestFactory(new ArrayList<DLTest>()));
+				new MockDLTestFactory(new ArrayList<DecisionListTest>()));
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 		learner.train(ds);
 		Assert.assertEquals(DecisionListLearner.FAILURE,

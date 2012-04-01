@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.DataSetFactory;
-import aima.core.learning.inductive.DLTest;
+import aima.core.learning.inductive.DecisionListTest;
 import aima.core.learning.inductive.DecisionList;
 
 /**
@@ -17,7 +17,7 @@ public class DecisionListTest {
 	@Test
 	public void testDecisonListWithNoTestsReturnsDefaultValue()
 			throws Exception {
-		DecisionList dlist = new DecisionList("Yes", "No");
+		DecisionList dlist = new DecisionList();
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 		Assert.assertEquals("No", dlist.predict(ds.getExample(0)));
 	}
@@ -25,10 +25,10 @@ public class DecisionListTest {
 	@Test
 	public void testDecisionListWithSingleTestReturnsTestValueIfTestSuccessful()
 			throws Exception {
-		DecisionList dlist = new DecisionList("Yes", "No");
+		DecisionList dlist = new DecisionList();
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 
-		DLTest test = new DLTest();
+		DecisionListTest test = new DecisionListTest();
 		test.add("type", "French");
 
 		dlist.add(test, "test1success");
@@ -39,14 +39,14 @@ public class DecisionListTest {
 	@Test
 	public void testDecisionListFallsThruToNextTestIfOneDoesntMatch()
 			throws Exception {
-		DecisionList dlist = new DecisionList("Yes", "No");
+		DecisionList dlist = new DecisionList();
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 
-		DLTest test1 = new DLTest();
+		DecisionListTest test1 = new DecisionListTest();
 		test1.add("type", "Thai"); // doesn't match first example
 		dlist.add(test1, "test1success");
 
-		DLTest test2 = new DLTest();
+		DecisionListTest test2 = new DecisionListTest();
 		test2.add("type", "French");
 		dlist.add(test2, "test2success");// matches first example
 
@@ -56,14 +56,14 @@ public class DecisionListTest {
 	@Test
 	public void testDecisionListFallsThruToDefaultIfNoTestMatches()
 			throws Exception {
-		DecisionList dlist = new DecisionList("Yes", "No");
+		DecisionList dlist = new DecisionList();
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 
-		DLTest test1 = new DLTest();
+		DecisionListTest test1 = new DecisionListTest();
 		test1.add("type", "Thai"); // doesn't match first example
 		dlist.add(test1, "test1success");
 
-		DLTest test2 = new DLTest();
+		DecisionListTest test2 = new DecisionListTest();
 		test2.add("type", "Burger");
 		dlist.add(test2, "test2success");// doesn't match first example
 
@@ -73,24 +73,24 @@ public class DecisionListTest {
 	@Test
 	public void testDecisionListHandlesEmptyDataSet() throws Exception {
 		// tests first base case of recursion
-		DecisionList dlist = new DecisionList("Yes", "No");
+		DecisionList dlist = new DecisionList();
 
-		DLTest test1 = new DLTest();
+		DecisionListTest test1 = new DecisionListTest();
 		test1.add("type", "Thai"); // doesn't match first example
 		dlist.add(test1, "test1success");
 	}
 
 	@Test
 	public void testDecisionListMerge() throws Exception {
-		DecisionList dlist1 = new DecisionList("Yes", "No");
-		DecisionList dlist2 = new DecisionList("Yes", "No");
+		DecisionList dlist1 = new DecisionList();
+		DecisionList dlist2 = new DecisionList();
 		DataSet ds = DataSetFactory.getRestaurantDataSet();
 
-		DLTest test1 = new DLTest();
+		DecisionListTest test1 = new DecisionListTest();
 		test1.add("type", "Thai"); // doesn't match first example
 		dlist1.add(test1, "test1success");
 
-		DLTest test2 = new DLTest();
+		DecisionListTest test2 = new DecisionListTest();
 		test2.add("type", "French");
 		dlist2.add(test2, "test2success");// matches first example
 
