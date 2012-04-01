@@ -1,67 +1,108 @@
 package aima.core.learning.inductive;
 
-import java.util.Hashtable;
-
+import aima.core.learning.framework.Attribute;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
+import java.util.LinkedList;
 
 /**
+ * Represents a single test in a decision list, see figure 18.10, page 716,
+ * AIMAv3
  * @author Ravi Mohan
- * 
+ * @author Andrew Brown
  */
 public class DLTest {
 
-	// represents a single test in the Decision List
-	private Hashtable<String, String> attrValues;
+    /**
+     * The test is a conjunction; every attribute in the test is a conjunct 
+     * that, when all proven true, it returns true.
+     */
+    private LinkedList<Attribute> conjuncts;
 
-	public DLTest() {
-		attrValues = new Hashtable<String, String>();
-	}
+    /**
+     * Constructor
+     */
+    public DLTest() {
+        this.conjuncts = new LinkedList<Attribute>();
+    }
 
-	public void add(String nta, String ntaValue) {
-		attrValues.put(nta, ntaValue);
+    /**
+     * Add a conjunct to the test
+     * @param attribute
+     * @param decision 
+     */
+    public void add(Attribute attribute) {
+        this.conjuncts.add(attribute);
+    }
 
-	}
+    /**
+     * Test an example for matching
+     * @param e
+     * @return 
+     */
+    public boolean matches(Example example) {
+        for (Attribute conjunct : this.conjuncts) {
+            Attribute exampleAttribute = example.get(conjunct.getName());
+            if (!conjunct.equals(exampleAttribute)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-	public boolean matches(Example e) {
-		for (String key : attrValues.keySet()) {
-			if (!(attrValues.get(key).equals(e.getAttributeValueAsString(key)))) {
-				return false;
-			}
-		}
-		return true;
-		// return e.targetValue().equals(targetValue);
-	}
+    /**
+     * Return matching examples from an example set
+     * @param examples
+     * @return 
+     */
+    public DataSet getMatchingExamples(DataSet examples) {
+        DataSet matched = new DataSet();
+        for (Example e : examples) {
+            if (matches(e)) {
+                matched.add(e);
+            }
+        }
+        return matched;
+    }
 
-	public DataSet matchedExamples(DataSet ds) {
-		DataSet matched = ds.emptyDataSet();
-		for (Example e : ds.examples) {
-			if (matches(e)) {
-				matched.add(e);
-			}
-		}
-		return matched;
-	}
+    /**
+     * Return non-matching examples from an example set
+     * @param examples
+     * @return 
+     */
+    public DataSet getNonMatchingExamples(DataSet examples) {
+        DataSet unmatched = new DataSet();
+        for (Example e : examples) {
+            if (!matches(e)) {
+                unmatched.add(e);
+            }
+        }
+        return unmatched;
+    }
 
-	public DataSet unmatchedExamples(DataSet ds) {
-		DataSet unmatched = ds.emptyDataSet();
-		for (Example e : ds.examples) {
-			if (!(matches(e))) {
-				unmatched.add(e);
-			}
-		}
-		return unmatched;
-	}
-
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		buf.append("IF  ");
-		for (String key : attrValues.keySet()) {
-			buf.append(key + " = ");
-			buf.append(attrValues.get(key) + " ");
-		}
-		buf.append(" DECISION ");
-		return buf.toString();
-	}
+    /**
+     * Return string representation
+     * @return 
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("[IF ");
+        if( this.conjuncts.size() > 0 ){
+            Attribute last = this.conjuncts.peekLast();
+            for (Attribute conjunct : this.conjuncts) {
+                s.append(conjunct.getName());
+                s.append("=");
+                s.append(conjunct.getValue());
+                if(!conjunct.equals(last)) s.append(" AND ");
+            }
+        }
+        else{
+            s.append("true ");
+        }
+        // decision
+        s.append(" THEN output(true) ELSE output(false)]");
+        // return
+        return s.toString();
+    }
 }
