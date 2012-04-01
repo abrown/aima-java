@@ -7,66 +7,95 @@ import aima.core.learning.framework.Example;
 
 /**
  * Implements the decision list object used by DECISION-LIST-LEARNING on 
- * page 717, AIMAv3; this implementation is generalized by using generics
- * so the DecisionListTest can be extended to more than just boolean
- * outcomes.
+ * page 717, AIMAv3.
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class DecisionList<E>{
-    
-	private String positive, negative;
+public class DecisionList {
 
-        /**
-         * "A decision list consists of a series of tests", page 715, AIMAv3
-         */
-	private List<DecisionListTest> tests;
+    /**
+     * Possible outcomes
+     */
+    public static final boolean MATCH = true;
+    public static final boolean FAILURE = false;
+    /**
+     * "A decision list consists of a series of tests", page 715, AIMAv3
+     */
+    private List<DecisionListTest> tests;
+    /**
+     * Outcomes
+     */
+    private HashMap<DecisionListTest, Boolean> outcomes;
 
-	private HashMap<DecisionListTest, String> testOutcomes;
+    /**
+     * Constructor
+     */
+    public DecisionList() {
+        this.tests = new ArrayList<DecisionListTest>();
+        this.outcomes = new HashMap<DecisionListTest, Boolean>();
+    }
 
-	public DecisionList(String positive, String negative) {
-		this.positive = positive;
-		this.negative = negative;
-		this.tests = new ArrayList<DecisionListTest>();
-		testOutcomes = new HashMap<DecisionListTest, String>();
-	}
+    /**
+     * Make prediction based on the decision list tests
+     * @param example
+     * @return true on match; false otherwise
+     */
+    public boolean predict(Example example) {
+        // test size
+        if (this.tests.isEmpty()) {
+            return DecisionList.FAILURE;
+        }
+        // test each outcome
+        for (DecisionListTest test : this.tests) {
+            if (test.matches(example)) {
+                return DecisionList.MATCH;
+            }
+        }
+        // default
+        return DecisionList.FAILURE;
+    }
 
-	public String predict(Example example) {
-		if (tests.size() == 0) {
-			return negative;
-		}
-		for (DecisionListTest test : tests) {
-			if (test.matches(example)) {
-				return testOutcomes.get(test);
-			}
-		}
-		return negative;
-	}
+    /**
+     * Add a test to the decision list
+     * @param test
+     * @param outcome 
+     */
+    public void add(DecisionListTest test) {
+        tests.add(test);
+    }
 
-	public void add(DecisionListTest test, String outcome) {
-		tests.add(test);
-		testOutcomes.put(test, outcome);
-	}
+    /**
+     * Merge this decision list with another
+     * @param list
+     * @return 
+     */
+    public DecisionList mergeWith(DecisionList list) {
+        DecisionList merged = new DecisionList();
+        // add these
+        for (DecisionListTest test : this.tests) {
+            merged.add(test);
+        }
+        // add those
+        for (DecisionListTest test : list.tests) {
+            merged.add(test);
+        }
+        // return
+        return merged;
+    }
 
-	public DecisionList mergeWith(DecisionList dlist2) {
-		DecisionList merged = new DecisionList(positive, negative);
-		for (DecisionListTest test : tests) {
-			merged.add(test, testOutcomes.get(test));
-		}
-		for (DecisionListTest test : dlist2.tests) {
-			merged.add(test, dlist2.testOutcomes.get(test));
-		}
-		return merged;
-	}
-
-	@Override
-	public String toString() {
-		StringBuffer buf = new StringBuffer();
-		for (DecisionListTest test : tests) {
-			buf.append(test.toString() + " => " + testOutcomes.get(test)
-					+ " ELSE \n");
-		}
-		buf.append("END");
-		return buf.toString();
-	}
+    /**
+     * Return string representation
+     * @return 
+     */
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        s.append("IF ");
+        for (DecisionListTest test : this.tests) {
+            s.append(test);
+            s.append(" THEN true ELSE ");
+        }
+        s.append("false");
+        return s.toString();
+    }
 }

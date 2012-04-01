@@ -83,18 +83,18 @@ public class DecisionListLearner implements Learner {
 	//
 	private DecisionList decisionListLearning(DataSet ds) {
 		if (ds.size() == 0) {
-			return new DecisionList(positive, negative);
+			return new DecisionList();
 		}
 		List<DecisionListTest> possibleTests = testFactory
 				.createDLTestsWithAttributeCount(ds, 1);
 		DecisionListTest test = getValidTest(possibleTests, ds);
 		if (test == null) {
-			return new DecisionList(null, FAILURE);
+			return new DecisionList();
 		}
 		// at this point there is a test that classifies some subset of examples
 		// with the same target value
 		DataSet matched = test.getMatchingExamples(ds);
-		DecisionList list = new DecisionList(positive, negative);
+		DecisionList list = new DecisionList();
 		list.add(test, matched.getExample(0).targetValue());
 		return list.mergeWith(decisionListLearning(test.getNonMatchingExamples(ds)));
 	}
