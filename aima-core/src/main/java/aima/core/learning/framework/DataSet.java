@@ -17,7 +17,7 @@ public class DataSet {
     /**
      * Constructor
      */
-    protected DataSet() {
+    public DataSet() {
         examples = new ArrayList<Example>();
     }
 
@@ -70,7 +70,7 @@ public class DataSet {
     public double getInformationFor(String attributeName) {
         HashMap<String, Integer> counts = new HashMap<String, Integer>();
         for (Example e : examples) {
-            String val = e.getAttributeValueAsString(attributeName);
+            String val = e.get(attributeName).toString();
             if (counts.containsKey(val)) {
                 counts.put(val, counts.get(val) + 1);
             } else {
@@ -94,7 +94,7 @@ public class DataSet {
     public HashMap<String, DataSet> splitByAttribute(String attributeName) {
         HashMap<String, DataSet> results = new HashMap<String, DataSet>();
         for (Example e : examples) {
-            String val = e.getAttributeValueAsString(attributeName);
+            String val = e.get(attributeName).toString();
             if (results.containsKey(val)) {
                 results.get(val).add(e);
             } else {
