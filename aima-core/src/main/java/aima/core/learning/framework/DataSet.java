@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class DataSet {
+public class DataSet implements Iterable<Example> {
 
     public ArrayList<Example> examples;
 
