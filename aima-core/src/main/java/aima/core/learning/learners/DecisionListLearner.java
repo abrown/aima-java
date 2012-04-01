@@ -5,7 +5,7 @@ import java.util.List;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
-import aima.core.learning.inductive.DLTest;
+import aima.core.learning.inductive.DecisionListTest;
 import aima.core.learning.inductive.DLTestFactory;
 import aima.core.learning.inductive.DecisionList;
 
@@ -85,23 +85,23 @@ public class DecisionListLearner implements Learner {
 		if (ds.size() == 0) {
 			return new DecisionList(positive, negative);
 		}
-		List<DLTest> possibleTests = testFactory
+		List<DecisionListTest> possibleTests = testFactory
 				.createDLTestsWithAttributeCount(ds, 1);
-		DLTest test = getValidTest(possibleTests, ds);
+		DecisionListTest test = getValidTest(possibleTests, ds);
 		if (test == null) {
 			return new DecisionList(null, FAILURE);
 		}
 		// at this point there is a test that classifies some subset of examples
 		// with the same target value
-		DataSet matched = test.matchedExamples(ds);
+		DataSet matched = test.getMatchingExamples(ds);
 		DecisionList list = new DecisionList(positive, negative);
 		list.add(test, matched.getExample(0).targetValue());
-		return list.mergeWith(decisionListLearning(test.unmatchedExamples(ds)));
+		return list.mergeWith(decisionListLearning(test.getNonMatchingExamples(ds)));
 	}
 
-	private DLTest getValidTest(List<DLTest> possibleTests, DataSet ds) {
-		for (DLTest test : possibleTests) {
-			DataSet matched = test.matchedExamples(ds);
+	private DecisionListTest getValidTest(List<DecisionListTest> possibleTests, DataSet ds) {
+		for (DecisionListTest test : possibleTests) {
+			DataSet matched = test.getMatchingExamples(ds);
 			if (!(matched.size() == 0)) {
 				if (allExamplesHaveSameTargetValue(matched)) {
 					return test;

@@ -11,19 +11,19 @@ import aima.core.learning.framework.DataSet;
  */
 public class DLTestFactory {
 
-	public List<DLTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
+	public List<DecisionListTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
 		if (i != 1) {
 			throw new RuntimeException(
 					"For now DLTests with only 1 attribute can be craeted , not"
 							+ i);
 		}
 		List<String> nonTargetAttributes = ds.getNonTargetAttributes();
-		List<DLTest> tests = new ArrayList<DLTest>();
+		List<DecisionListTest> tests = new ArrayList<DecisionListTest>();
 		for (String ntAttribute : nonTargetAttributes) {
 			List<String> ntaValues = ds.getPossibleAttributeValues(ntAttribute);
 			for (String ntaValue : ntaValues) {
 
-				DLTest test = new DLTest();
+				DecisionListTest test = new DecisionListTest();
 				test.add(ntAttribute, ntaValue);
 				tests.add(test);
 
