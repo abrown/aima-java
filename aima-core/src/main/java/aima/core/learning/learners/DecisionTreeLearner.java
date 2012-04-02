@@ -5,7 +5,7 @@ import java.util.List;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
-import aima.core.learning.inductive.ConstantDecisonTree;
+import aima.core.learning.inductive.DecisionTreeLeaf;
 import aima.core.learning.inductive.DecisionTree;
 import aima.core.util.Util;
 
@@ -41,7 +41,7 @@ public class DecisionTreeLearner implements Learner {
     public void train(DataSet ds) {
         List<String> attributes = ds.getNonTargetAttributes();
         this.tree = decisionTreeLearning(ds, attributes,
-                new ConstantDecisonTree(defaultValue));
+                new DecisionTreeLeaf(defaultValue));
     }
 
     @Override
@@ -97,12 +97,12 @@ public class DecisionTreeLearner implements Learner {
      * @return 
      */
     private DecisionTree decisionTreeLearning(DataSet ds,
-            List<String> attributeNames, ConstantDecisonTree defaultTree) {
+            List<String> attributeNames, DecisionTreeLeaf defaultTree) {
         if (ds.size() == 0) {
             return defaultTree;
         }
         if (allExamplesHaveSameClassification(ds)) {
-            return new ConstantDecisonTree(ds.getExample(0).targetValue());
+            return new DecisionTreeLeaf(ds.getExample(0).targetValue());
         }
         if (attributeNames.size() == 0) {
             return majorityValue(ds);
@@ -110,7 +110,7 @@ public class DecisionTreeLearner implements Learner {
         String chosenAttribute = chooseAttribute(ds, attributeNames);
 
         DecisionTree tree = new DecisionTree(chosenAttribute);
-        ConstantDecisonTree m = majorityValue(ds);
+        DecisionTreeLeaf m = majorityValue(ds);
 
         List<String> values = ds.getPossibleAttributeValues(chosenAttribute);
         for (String v : values) {
@@ -125,10 +125,10 @@ public class DecisionTreeLearner implements Learner {
         return tree;
     }
 
-    private ConstantDecisonTree majorityValue(DataSet ds) {
+    private DecisionTreeLeaf majorityValue(DataSet ds) {
         Learner learner = new MajorityLearner();
         learner.train(ds);
-        return new ConstantDecisonTree(learner.predict(ds.getExample(0)));
+        return new DecisionTreeLeaf(learner.predict(ds.getExample(0)));
     }
 
     private String chooseAttribute(DataSet ds, List<String> attributeNames) {
