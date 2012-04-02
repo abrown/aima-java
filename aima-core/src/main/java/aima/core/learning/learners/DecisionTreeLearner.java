@@ -109,7 +109,7 @@ public class DecisionTreeLearner implements Learner {
         }
         String chosenAttribute = chooseAttribute(ds, attributeNames);
 
-        DecisionTree tree = new DecisionTree(chosenAttribute);
+        DecisionTree tree = new DecisionTree(null);
         DecisionTreeLeaf m = majorityValue(ds);
 
         List<String> values = ds.getPossibleAttributeValues(chosenAttribute);

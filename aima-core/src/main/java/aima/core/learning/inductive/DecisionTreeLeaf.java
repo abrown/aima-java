@@ -10,7 +10,7 @@ import aima.core.util.Util;
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class DecisionTreeLeaf<E> extends DecisionTree {
+public class DecisionTreeLeaf<E> extends DecisionTree<E> {
 
     /**
      * Represents the value of the decision; generic for use with multiple
@@ -32,7 +32,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree {
      * @param decision 
      */
     @Override
-    public void addLeaf(String attributeValue, String decision) {
+    public <F> void addLeaf(E value, F decision) {
         throw new RuntimeException("Cannot add a leaf to DecisionTreeLeaf.");
     }
 
@@ -42,7 +42,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree {
      * @param tree 
      */
     @Override
-    public void addNode(String attributeValue, DecisionTree tree) {
+    public void addNode(E value, DecisionTree node) {
         throw new RuntimeException("Cannot add a node to DecisionTreeLeaf.");
     }
 
@@ -72,7 +72,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree {
      * @return 
      */
     @Override
-    public String toString(int depth, StringBuffer buf) {
+    public String toString(int depth, StringBuilder buf) {
         buf.append(Util.ntimes("\t", depth + 1));
         buf.append("DECISION -> " + value + "\n");
         return buf.toString();
