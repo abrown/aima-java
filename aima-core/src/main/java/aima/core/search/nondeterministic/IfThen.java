@@ -1,9 +1,4 @@
-/*
- * @copyright Copyright 2012 Andrew Brown. All rights reserved.
- * @license GNU/GPL.
- */
 package aima.core.search.nondeterministic;
-
 import java.util.ArrayList;
 
 /**

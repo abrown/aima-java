@@ -1,9 +1,4 @@
-/*
- * @copyright Copyright 2012 Andrew Brown. All rights reserved.
- * @license GNU/GPL.
- */
 package aima.test.core.unit.search.nondeterministic;
-
 import aima.core.agent.Action;
 import aima.core.agent.Agent;
 import aima.core.agent.EnvironmentState;
@@ -11,9 +6,7 @@ import aima.core.agent.Percept;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 import aima.core.environment.vacuum.*;
-import aima.core.agent.impl.*;
 import aima.core.search.framework.*;
 import aima.core.search.nondeterministic.AndOrSearch;
 import aima.core.search.nondeterministic.NondeterministicProblem;
@@ -126,6 +119,10 @@ class NondeterministicVacuumEnvironment extends VacuumEnvironment {
     }
 }
 
+/**
+ * Creates the vacuum agent
+ * @author andrew
+ */
 class VacuumWorldAgent implements Agent {
 
     public Action execute(Percept percept) {
@@ -142,7 +139,7 @@ class VacuumWorldAgent implements Agent {
 }
 
 /**
- * 
+ * Specifies the actions available to the agent at state s
  * @author andrew
  */
 class VacuumWorldActions implements ActionsFunction {
@@ -280,6 +277,10 @@ class VacuumWorldGoalTest implements GoalTest {
     }
 }
 
+/**
+ * Measures step cost
+ * @author Andrew Brown
+ */
 class VacuumWorldStepCost implements StepCostFunction {
 
     public double c(Object state, Action action, Object sDelta) {
