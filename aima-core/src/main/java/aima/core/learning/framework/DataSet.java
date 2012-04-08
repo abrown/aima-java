@@ -136,6 +136,7 @@ public class DataSet implements Iterable<Example> {
      * Iterator
      * @return 
      */
+    @Override
     public Iterator<Example> iterator() {
         return examples.iterator();
     }
