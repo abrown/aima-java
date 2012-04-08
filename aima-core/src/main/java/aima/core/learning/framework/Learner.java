@@ -23,12 +23,12 @@ public interface Learner {
      * @param example an example
      * @return the outcome predicted for the specified example
      */
-    String predict(Example example);
+    <E> E predict(Example example);
 
     /**
      * Returns the accuracy of the hypothesis on the specified set of examples
      * @param test_set the test data set.
-     * @return the accuracy of the hypothesis on the specified set of examples
+     * @return the accuracy of the hypothesis on the specified set of examples as an array like [#correct, #incorrect]
      */
     int[] test(DataSet test_set);
 }

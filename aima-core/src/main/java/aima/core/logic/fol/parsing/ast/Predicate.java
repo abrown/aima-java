@@ -5,106 +5,118 @@ import java.util.Collections;
 import java.util.List;
 
 import aima.core.logic.fol.parsing.FOLVisitor;
+import java.util.Arrays;
 
 /**
  * @author Ravi Mohan
  * @author Ciaran O'Reilly
+ * @author Andrew Brown
  */
 public class Predicate implements AtomicSentence {
-	private String predicateName;
-	private List<Term> terms = new ArrayList<Term>();
-	private String stringRep = null;
-	private int hashCode = 0;
 
-	public Predicate(String predicateName, List<Term> terms) {
-		this.predicateName = predicateName;
-		this.terms.addAll(terms);
-	}
+    private String predicateName;
+    private List<Term> terms = new ArrayList<Term>();
+    private String stringRep = null;
+    private int hashCode = 0;
 
-	public String getPredicateName() {
-		return predicateName;
-	}
+    public Predicate(String predicateName, List<Term> terms) {
+        this.predicateName = predicateName;
+        this.terms.addAll(terms);
+    }
 
-	public List<Term> getTerms() {
-		return Collections.unmodifiableList(terms);
-	}
+    /**
+     * Constructor
+     * @param name
+     * @param terms 
+     */
+    public Predicate(String name, Term... terms) {
+        this.predicateName = name;
+        this.terms.addAll(Arrays.asList(terms));
+    }
 
-	//
-	// START-AtomicSentence
-	public String getSymbolicName() {
-		return getPredicateName();
-	}
+    public String getPredicateName() {
+        return predicateName;
+    }
 
-	public boolean isCompound() {
-		return true;
-	}
+    public List<Term> getTerms() {
+        return Collections.unmodifiableList(terms);
+    }
 
-	public List<Term> getArgs() {
-		return getTerms();
-	}
+    //
+    // START-AtomicSentence
+    public String getSymbolicName() {
+        return getPredicateName();
+    }
 
-	public Object accept(FOLVisitor v, Object arg) {
-		return v.visitPredicate(this, arg);
-	}
+    public boolean isCompound() {
+        return true;
+    }
 
-	public Predicate copy() {
-		List<Term> copyTerms = new ArrayList<Term>();
-		for (Term t : terms) {
-			copyTerms.add(t.copy());
-		}
-		return new Predicate(predicateName, copyTerms);
-	}
+    public List<Term> getArgs() {
+        return getTerms();
+    }
 
-	// END-AtomicSentence
-	//
+    public Object accept(FOLVisitor v, Object arg) {
+        return v.visitPredicate(this, arg);
+    }
 
-	@Override
-	public boolean equals(Object o) {
+    public Predicate copy() {
+        List<Term> copyTerms = new ArrayList<Term>();
+        for (Term t : terms) {
+            copyTerms.add(t.copy());
+        }
+        return new Predicate(predicateName, copyTerms);
+    }
 
-		if (this == o) {
-			return true;
-		}
-		if (!(o instanceof Predicate)) {
-			return false;
-		}
-		Predicate p = (Predicate) o;
-		return p.getPredicateName().equals(getPredicateName())
-				&& p.getTerms().equals(getTerms());
-	}
+    // END-AtomicSentence
+    //
+    @Override
+    public boolean equals(Object o) {
 
-	@Override
-	public int hashCode() {
-		if (0 == hashCode) {
-			hashCode = 17;
-			hashCode = 37 * hashCode + predicateName.hashCode();
-			for (Term t : terms) {
-				hashCode = 37 * hashCode + t.hashCode();
-			}
-		}
-		return hashCode;
-	}
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Predicate)) {
+            return false;
+        }
+        Predicate p = (Predicate) o;
+        return p.getPredicateName().equals(getPredicateName())
+                && p.getTerms().equals(getTerms());
+    }
 
-	@Override
-	public String toString() {
-		if (null == stringRep) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(predicateName);
-			sb.append("(");
+    @Override
+    public int hashCode() {
+        if (0 == hashCode) {
+            hashCode = 17;
+            hashCode = 37 * hashCode + predicateName.hashCode();
+            for (Term t : terms) {
+                hashCode = 37 * hashCode + t.hashCode();
+            }
+        }
+        return hashCode;
+    }
 
-			boolean first = true;
-			for (Term t : terms) {
-				if (first) {
-					first = false;
-				} else {
-					sb.append(",");
-				}
-				sb.append(t.toString());
-			}
+    @Override
+    public String toString() {
+        if (null == stringRep) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(predicateName);
+            sb.append("(");
 
-			sb.append(")");
-			stringRep = sb.toString();
-		}
+            boolean first = true;
+            for (Term t : terms) {
+                if (first) {
+                    first = false;
+                } else {
+                    sb.append(",");
+                }
+                sb.append(t.toString());
+            }
 
-		return stringRep;
-	}
+            sb.append(")");
+            stringRep = sb.toString();
+        }
+
+        return stringRep;
+    }
 }

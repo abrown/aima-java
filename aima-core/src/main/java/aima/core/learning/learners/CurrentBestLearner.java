@@ -1,26 +1,54 @@
 package aima.core.learning.learners;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import aima.core.learning.framework.Attribute;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
-import aima.core.learning.knowledge.CurrentBestLearning;
-import aima.core.learning.knowledge.FOLDataSetDomain;
 import aima.core.learning.knowledge.FOLExample;
 import aima.core.learning.knowledge.Hypothesis;
+import aima.core.logic.fol.domain.FOLDomain;
 import aima.core.logic.fol.inference.FOLOTTERLikeTheoremProver;
 import aima.core.logic.fol.inference.InferenceResult;
 import aima.core.logic.fol.kb.FOLKnowledgeBase;
-import aima.core.logic.fol.kb.data.CNF;
+import aima.core.logic.fol.parsing.ast.NotSentence;
+import aima.core.logic.fol.parsing.ast.Predicate;
 import aima.core.logic.fol.parsing.ast.Sentence;
 
 /**
+ * Implements the CURRENT-BEST-LEARNING algorithm from page 771, AIMAv3. The
+ * algorithm works by creating hypotheses (in essence, first order logic sentences)
+ * that are compared with examples (also sentences). In this class, we use
+ * Hypothesis to represent the FOL hypotheses and FOLExample to convert 
+ * the common Example class to FOL.
  * @author Ciaran O'Reilly
- * 
+ * @author Andrew Brown
  */
 public class CurrentBestLearner implements Learner {
+
+    /**
+     * The predicate we are seeking to learn how to classify; e.g. "WillWait" on page 770, AIMAv3
+     */
+    private String classificationPredicate;
+    /**
+     * The current best hypothesis that fits the example set
+     */
+    private Hypothesis bestHypothesis;
+    /**
+     * The complete domain of all predicates and constants used in this data set
+     */
+    private FOLDomain domain;
+    /**
+     * The knowledge base
+     */
+    private FOLKnowledgeBase kb;
+
+    /**
+     * Constructor
+     * @param classificationPredicate the predicate we are seeking to learn how to classify; e.g. "WillWait"
+     */
+    public CurrentBestLearner(String classificationPredicate) {
+        this.classificationPredicate = classificationPredicate;
+    }
 
     /**
      * Artificial Intelligence A Modern Approach (3rd Edition): Figure 19.2, page
@@ -58,134 +86,199 @@ public class CurrentBestLearner implements Learner {
         FOLExample e = (FOLExample) examples.getExample(0); // get first example
         if (isConsistentWith(e, h)) {
             return currentBestLearning(examples.remove(e), h);
-    
-        }
-        else if( isFalsePositive(e, h)) {
-            for(Hypothesis h1 : specialize(h, examples)){
+        } else if (isFalsePositive(e, h)) {
+            for (Hypothesis h1 : specialize(h, examples)) {
                 Hypothesis h2 = currentBestLearning(examples.remove(e), h1);
-                if( h2 != null ) return h2;
+                if (h2 != null) {
+                    return h2;
+                }
             }
-        }
-        else if( isFalseNegative(e, h)){
-            for(Hypothesis h1 : generalize(h, examples)){
+        } else if (isFalseNegative(e, h)) {
+            for (Hypothesis h1 : generalize(h, examples)) {
                 Hypothesis h2 = currentBestLearning(examples.remove(e), h1);
-                if( h2 != null ) return h2;
+                if (h2 != null) {
+                    return h2;
+                }
             }
         }
         return null;
     }
-    
+
     /**
-     * Determines whether the example is consistent with the hypothesis
+     * Determine whether the example is consistent with the hypothesis
      * @param example
      * @param hypothesis
      * @return 
      */
-    public boolean isConsistentWith(FOLExample example, Hypothesis hypothesis){
-        Sentence classification = example.toClassification();
-        Sentence description = example.toDescription();
-        /**
-         * @todo determine whether example satisfies hypothesis; currently
-         * unknown what avenue to take on this
-         */
+    public boolean isConsistentWith(FOLExample example, Hypothesis hypothesis) {
+        if (hypothesis == null) {
+            return false;
+        }
+        // setup knowledge base
+        this.kb.clear(); // removes all previous sentences
+        this.kb.tell(example.toDescription());
+        this.kb.tell(this.bestHypothesis);
+        // infer
+        InferenceResult result = kb.ask(example.toClassification());
+        // return
+        if (result.isTrue() && example.getOutput() != null ) {
+            return true;
+        }
         return false;
     }
-    
-    public boolean isFalsePositive(Example example, Hypothesis hypothesis){
-        /**
-         * @todo see isConsistentWith()...
-         */
+
+    /**
+     * Determine whether the hypothesis returns a false positive
+     * @param example
+     * @param hypothesis
+     * @return 
+     */
+    public boolean isFalsePositive(FOLExample example, Hypothesis hypothesis) {
+        if (hypothesis == null) {
+            return false;
+        }
+        // setup knowledge base
+        this.kb.clear(); // removes all previous sentences
+        this.kb.tell(example.toDescription());
+        this.kb.tell(this.bestHypothesis);
+        // infer
+        InferenceResult result = kb.ask(example.toClassification());
+        // return
+        if (result.isTrue() && example.getOutput() == null ) {
+            return true;
+        }
         return false;
     }
-    
-    public boolean isFalseNegative(Example example, Hypothesis hypothesis){
-        /**
-         * @todo see isConsistentWith()...
-         */
+
+    /**
+     * Determine whether the hypothesis returns a false negative
+     * @param example
+     * @param hypothesis
+     * @return 
+     */
+    public boolean isFalseNegative(FOLExample example, Hypothesis hypothesis) {
+        if (hypothesis == null) {
+            return false;
+        }
+        // setup knowledge base
+        this.kb.clear(); // removes all previous sentences
+        this.kb.tell(example.toDescription());
+        this.kb.tell(this.bestHypothesis);
+        // infer
+        InferenceResult result = kb.ask(example.toClassification());
+        // return
+        if (!result.isTrue() && example.getOutput() != null ) {
+            return true;
+        }
         return false;
     }
-    
-    public Hypothesis[] specialize(Hypothesis hypothesis, DataSet examples){
+
+    /**
+     * Return 
+     * @param hypothesis
+     * @param examples
+     * @return 
+     */
+    public Hypothesis[] specialize(Hypothesis hypothesis, DataSet examples) {
         /**
          * @todo
          */
         return null;
     }
-    
-    public Hypothesis[] generalize(Hypothesis hypothesis, DataSet examples){
+
+    public Hypothesis[] generalize(Hypothesis hypothesis, DataSet examples) {
         /**
          * @todo 
          */
         return null;
     }
-    
-//    private String trueGoalValue = null;
-//    private FOLDataSetDomain folDSDomain = null;
-//    private FOLKnowledgeBase kb = null;
-//    private Hypothesis currentBestHypothesis = null;
 
-    //
-    // PUBLIC METHODS
-    //
-//    public CurrentBestLearner(String trueGoalValue) {
-//        this.trueGoalValue = trueGoalValue;
-//    }
-    
-//
-//    //
-//    // START-Learner
-//    public void train(DataSet ds) {
-//        folDSDomain = new FOLDataSetDomain(ds.specification, trueGoalValue);
-//        List<FOLExample> folExamples = new ArrayList<FOLExample>();
-//        int egNo = 1;
-//        for (Example e : ds.examples) {
-//            folExamples.add(new FOLExample(folDSDomain, e, egNo));
-//            egNo++;
-//        }
-//
-//        // Setup a KB to be used for learning
-//        kb = new FOLKnowledgeBase(folDSDomain, new FOLOTTERLikeTheoremProver(
-//                1000, false));
-//
-//        CurrentBestLearning cbl = new CurrentBestLearning(folDSDomain, kb);
-//
-//        currentBestHypothesis = cbl.currentBestLearning(folExamples);
-//    }
-//
-//    public String predict(Example e) {
-//        String prediction = "~" + e.targetValue();
-//        if (null != currentBestHypothesis) {
-//            FOLExample etp = new FOLExample(folDSDomain, e, 0);
-//            kb.clear();
-//            kb.tell(etp.getDescription());
-//            kb.tell(currentBestHypothesis.getHypothesis());
-//            InferenceResult ir = kb.ask(etp.getClassification());
-//            if (ir.isTrue()) {
-//                if (trueGoalValue.equals(e.targetValue())) {
-//                    prediction = e.targetValue();
-//                }
-//            } else if (ir.isPossiblyFalse() || ir.isUnknownDueToTimeout()) {
-//                if (!trueGoalValue.equals(e.targetValue())) {
-//                    prediction = e.targetValue();
-//                }
-//            }
-//        }
-//
-//        return prediction;
-//    }
-//
-//    public int[] test(DataSet ds) {
-//        int[] results = new int[]{0, 0};
-//
-//        for (Example e : ds.examples) {
-//            if (e.targetValue().equals(predict(e))) {
-//                results[0] = results[0] + 1;
-//            } else {
-//                results[1] = results[1] + 1;
-//            }
-//        }
-//        return results;
-//    }
-//    // END-Learner
-//    //
+    /**
+     * Train this learner to correctly classify the set of examples
+     * @param examples 
+     */
+    @Override
+    public void train(DataSet examples) {
+        // setup
+        this.domain = this.getDomain(examples);
+        this.kb = new FOLKnowledgeBase(this.domain, new FOLOTTERLikeTheoremProver(1000, false));
+        // run CURRENT-BEST-LEARNING
+        this.bestHypothesis = currentBestLearning(examples, null);
+    }
+
+    /**
+     * Predict an outcome based on the currently-held best hypothesis
+     * @param example
+     * @return 
+     */
+    @Override
+    public String predict(Example example) {
+        // example must be a FOLExample
+        FOLExample e = (FOLExample) example;
+        // check if the hypothesis is valid
+        if (this.bestHypothesis == null) {
+            NotSentence n = new NotSentence(new Predicate(this.classificationPredicate, e.toConstant()));
+            return n.toString();
+        }
+        // setup knowledge base
+        this.kb.clear(); // removes all previous sentences
+        this.kb.tell(e.toDescription());
+        this.kb.tell(this.bestHypothesis);
+        // infer
+        InferenceResult result = kb.ask(e.toClassification());
+        // return
+        if (result.isTrue()) {
+            return e.getOutput().toString();
+        } else {
+            // possibly: result.isPossiblyFalse(), result.isUnknownDueToTimeout()
+            return null;
+        }
+    }
+
+    /**
+     * Returns an array of matches and failures, like [#correct, #incorrect].
+     * @param examples
+     * @return 
+     */
+    @Override
+    public int[] test(DataSet examples) {
+        // setup
+        int[] results = new int[]{0, 0};
+        // loop through example set
+        for (Example e : examples) {
+            String predicted = this.predict(e);
+            String actual = e.getOutput().toString(); // @todo make this comparison a real object comparison, not a string comparison
+            if (predicted.equals(actual)) {
+                results[0]++;
+            } else {
+                results[1]++;
+            }
+        }
+        // return
+        return results;
+    }
+
+    /**
+     * Creates the FOL domain based on the set of examples; @todo potential
+     * issue when the data set does not contain all constants/predicates
+     * @param examples
+     * @return 
+     */
+    private FOLDomain getDomain(DataSet examples) {
+        // setup
+        this.domain = new FOLDomain();
+        for (Example e : examples) {
+            // add output value as a constant
+            this.domain.addConstant(e.getOutput().toString());
+            // loop through attributes
+            for (Attribute a : e.getAttributes()) {
+                // add each attribute name as a predicate
+                this.domain.addPredicate(a.getName());
+                // add each attribute value as a constant
+                this.domain.addConstant(a.getValue().toString());
+            }
+        }
+        // return
+        return this.domain;
+    }
 }

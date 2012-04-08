@@ -22,7 +22,7 @@ import aima.core.logic.fol.parsing.ast.Term;
  */
 public class FOLExample extends Example {
 
-    String classificationPredicate = "UnknownClassifier";
+    public String classificationPredicate = "UnknownClassifier";
     
     /**
      * Returns the constant representing this example; uses hashCode() as it
