@@ -1,10 +1,7 @@
 package aima.core.learning.framework;
 
-import aima.core.logic.fol.kb.data.CNF;
-import aima.core.logic.fol.kb.data.Clause;
-import aima.core.logic.fol.kb.data.Literal;
-import aima.core.logic.fol.parsing.ast.Predicate;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Represents a learning example; according to page 699, in a Boolean decision 
@@ -64,6 +61,22 @@ public class Example<E> {
     }
 
     /**
+     * Returns the output value
+     * @return 
+     */
+    public E getOutput() {
+        return this.outputValue;
+    }
+    
+    /**
+     * Returns the list of attributes
+     * @return 
+     */
+    public Attribute[] getAttributes(){
+        return this.inputAttributes.toArray(new Attribute[0]);
+    }
+
+    /**
      * Returns string representation
      * @return 
      */
@@ -74,28 +87,6 @@ public class Example<E> {
         s.append(" --> ");
         s.append(outputValue);
         return s.toString();
-    }
-
-    /**
-     * Returns the example as a CNF sentence in first order logic; the attribute
-     * values must be Predicates or an exception is thrown
-     * @return 
-     */
-    public CNF toConjunction() {
-        ArrayList<Clause> clauses = new ArrayList<Clause>();
-        for (Attribute a : inputAttributes) {
-            if (a.getValue() instanceof Predicate) {
-                Clause c = new Clause();
-                c.addLiteral(new Literal((Predicate) a.getValue()));
-                clauses.add(c);
-            } else {
-                throw new RuntimeException("The example must be made up only of first order logic nodes (FOLNode) to be converted to a Sentence.");
-            }
-        }
-        // create sentence
-        CNF conjunction = new CNF(clauses);
-        // return
-        return conjunction;
     }
 
     /**
