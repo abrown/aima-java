@@ -1,9 +1,7 @@
 package aima.core.learning.knowledge;
-
 import aima.core.learning.framework.Attribute;
 import java.util.ArrayList;
 import java.util.List;
-
 import aima.core.learning.framework.Example;
 import aima.core.logic.fol.Connectors;
 import aima.core.logic.fol.parsing.ast.ConnectedSentence;
