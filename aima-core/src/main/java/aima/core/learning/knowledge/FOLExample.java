@@ -1,5 +1,6 @@
 package aima.core.learning.knowledge;
 
+import aima.core.learning.framework.Attribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,98 +14,89 @@ import aima.core.logic.fol.parsing.ast.Sentence;
 import aima.core.logic.fol.parsing.ast.Term;
 
 /**
+ * Extends Example to work with CURRENT-BEST-LEARNING (page 771, AIMAv3). This
+ * class converts the attributes in an Example to Predicates in a first order
+ * logic sentence.
  * @author Ciaran O'Reilly
- * 
+ * @author Andrew Brown
  */
-public class FOLExample {
-	private FOLDataSetDomain folDSDomain = null;
-	private Example example = null;
-	private int egNo = 0;
-	//
-	private Constant ithExampleConstant = null;
-	private Sentence classification = null;
-	private Sentence description = null;
+public class FOLExample extends Example {
 
-	//
-	// PUBLIC METHODS
-	//
-	public FOLExample(FOLDataSetDomain folDSDomain, Example example, int egNo) {
-		this.folDSDomain = folDSDomain;
-		this.example = example;
-		this.egNo = egNo;
-		constructFOLEg();
-	}
+    String classificationPredicate = "UnknownClassifier";
+    
+    /**
+     * Returns the constant representing this example; uses hashCode() as it
+     * is the most convenient pattern in Java for uniquely representing this 
+     * object.
+     * @return 
+     */
+    public Constant toConstant(){
+        return new Constant("X_"+this.hashCode());
+    }
+    
+    /**
+     * Returns the classification sentence for this example; e.g. 
+     * "WillWait(X_83478)" or "NOT WillWait(X_83478)".
+     * @param classificationPredicate
+     * @return 
+     */
+    public Sentence toClassification() {
+        List<Term> terms = new ArrayList<Term>();
+        terms.add(this.toConstant());
+        Sentence classification = new Predicate(this.classificationPredicate, terms);
+        if (this.getOutput() == null){
+            classification = new NotSentence(classification);
+        }
+        return classification;
+    }
 
-	public int getExampleNumber() {
-		return egNo;
-	}
-
-	public Sentence getClassification() {
-		return classification;
-	}
-
-	public Sentence getDescription() {
-		return description;
-	}
-
-	@Override
-	public String toString() {
-		return classification.toString() + " " + Connectors.AND + " "
-				+ description.toString();
-	}
-
-	//
-	// PRIVATE METHODS
-	//
-	private void constructFOLEg() {
-		ithExampleConstant = new Constant(folDSDomain.getExampleConstant(egNo));
-
-		List<Term> terms = new ArrayList<Term>();
-		terms.add(ithExampleConstant);
-		// Create the classification sentence
-		classification = new Predicate(folDSDomain.getGoalPredicateName(),
-				terms);
-		if (!example.getAttributeValueAsString(
-				folDSDomain.getDataSetTargetName()).equals(
-				folDSDomain.getTrueGoalValue())) {
-			// if not true then needs to be a Not sentence
-			classification = new NotSentence(classification);
-		}
-
-		// Create the description sentence
-		List<Sentence> descParts = new ArrayList<Sentence>();
-		for (String dname : folDSDomain.getDescriptionDataSetNames()) {
-			String foldDName = folDSDomain.getFOLName(dname);
-			terms = new ArrayList<Term>();
-			terms.add(ithExampleConstant);
-			// If multivalued becomes a two place predicate
-			// e.g: Patrons(X1, Some)
-			// otherwise: Hungry(X1) or ~ Hungry(X1)
-			// see pg 769 of AIMA
-			Sentence part = null;
-			if (folDSDomain.isMultivalued(dname)) {
-				terms.add(new Constant(folDSDomain.getFOLName(example
-						.getAttributeValueAsString(dname))));
-				part = new Predicate(foldDName, terms);
-			} else {
-				part = new Predicate(foldDName, terms);
-				// Need to determine if false
-				if (!folDSDomain.getTrueGoalValue().equals(
-						example.getAttributeValueAsString(dname))) {
-					part = new NotSentence(part);
-				}
-			}
-			descParts.add(part);
-		}
-		if (descParts.size() == 1) {
-			description = descParts.get(0);
-		} else if (descParts.size() > 1) {
-			description = new ConnectedSentence(Connectors.AND,
-					descParts.get(0), descParts.get(1));
-			for (int i = 2; i < descParts.size(); i++) {
-				description = new ConnectedSentence(Connectors.AND,
-						description, descParts.get(i));
-			}
-		}
-	}
+    /**
+     * Returns the Example as a first order logic sentence; e.g. "Patrons(X_1234, Full)
+     * AND NOT Hungry(X_1234)".
+     * @return 
+     */
+    public Sentence toDescription() {
+        // collect predicates for this example
+        List<Sentence> predicates = new ArrayList<Sentence>();
+        for (Attribute a : this.getAttributes()) {
+            // create predicate terms
+            Sentence predicate = null;
+            List<Term> terms = new ArrayList<Term>();
+            terms.add(this.toConstant());
+            // single value predicate
+            if( a.getValue() instanceof Boolean ){
+                boolean value = (Boolean) a.getValue();
+                if( value ){
+                    // do nothing; e.g. Predicate(X_1385)
+                    predicate = new Predicate(a.getName(), terms);
+                }
+                else{
+                    // create not-sentence
+                    predicate = new Predicate(a.getName(), terms);
+                    predicate = new NotSentence(predicate);
+                }
+            }
+            // multi-value predicate
+            else{
+                Constant value = new Constant(a.getValue().toString());
+                terms.add(value);
+                predicate = new Predicate(a.getName(), terms);
+            }
+            // add predicate
+            predicates.add(predicate);
+        }
+        // compile as ConnectedSentence
+        Sentence output = null;
+        if(predicates.size() > 1){
+            output = new ConnectedSentence(Connectors.AND, predicates.get(0), predicates.get(1));
+            for (int i = 2; i < predicates.size(); i++) {
+                output = new ConnectedSentence(Connectors.AND, output, predicates.get(i));
+            }
+        }
+        else{
+            output = predicates.get(0);
+        }
+        // return
+        return output;
+    }
 }
