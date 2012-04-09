@@ -16,12 +16,14 @@ public class DecisionList {
     /**
      * Possible outcomes
      */
-    public static final boolean MATCH = true;
+    public static final boolean SUCCESS = true;
     public static final boolean FAILURE = false;
+    
     /**
      * "A decision list consists of a series of tests", page 715, AIMAv3
      */
     private List<DecisionListTest> tests;
+    
     /**
      * Outcomes
      */
@@ -48,7 +50,7 @@ public class DecisionList {
         // test each outcome
         for (DecisionListTest test : this.tests) {
             if (test.matches(example)) {
-                return DecisionList.MATCH;
+                return DecisionList.SUCCESS;
             }
         }
         // default
