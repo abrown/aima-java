@@ -12,7 +12,6 @@ import aima.core.logic.fol.inference.InferenceResult;
 import aima.core.logic.fol.kb.FOLKnowledgeBase;
 import aima.core.logic.fol.parsing.ast.NotSentence;
 import aima.core.logic.fol.parsing.ast.Predicate;
-import aima.core.logic.fol.parsing.ast.Sentence;
 
 /**
  * Implements the CURRENT-BEST-LEARNING algorithm from page 771, AIMAv3. The
