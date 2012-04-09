@@ -67,12 +67,12 @@ public class Example<E> {
     public E getOutput() {
         return this.outputValue;
     }
-    
+
     /**
      * Returns the list of attributes
      * @return 
      */
-    public Attribute[] getAttributes(){
+    public Attribute[] getAttributes() {
         return this.inputAttributes.toArray(new Attribute[0]);
     }
 
