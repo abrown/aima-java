@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import aima.core.util.Util;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Provides methods for representing a set of learning examples
@@ -61,6 +62,21 @@ public class DataSet implements Iterable<Example> {
         }
         return ds;
     }
+    
+    /**
+     * Return all possible attributes (a name/value pair) in the given example
+     * set; by using a HashSet, no duplicates should exist.
+     * @return 
+     */
+    public HashSet<Attribute> getPossibleAttributes(){
+        HashSet<Attribute> possibleAttributes = new HashSet<Attribute>();
+        for(Example e:this){
+            for(Attribute a:e.getAttributes()){
+                possibleAttributes.add(a);
+            }
+        }
+        return possibleAttributes;
+    }
 
     /**
      * Returns the distribution
@@ -85,7 +101,7 @@ public class DataSet implements Iterable<Example> {
         data = Util.normalize(data);
         return Util.information(data);
     }
-
+    
     /**
      * Splits the set by attribute
      * @param attributeName
