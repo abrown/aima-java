@@ -6,7 +6,7 @@ package aima.core.learning.framework;
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class Attribute<E>{
+public class Attribute<E> {
 
     String name;
     E value;
@@ -97,13 +97,19 @@ public class Attribute<E>{
     public String toString() {
         return this.value.toString();
     }
-    
+
     /**
      * Checks if this attribute is equivalent to another
      * @param a
      * @return 
      */
-    public boolean equals(Attribute a){
-        return this.getValue().equals(a.getValue());
+    public boolean equals(Attribute a) {
+        if (!this.getName().equals(a.getName())) {
+            return false;
+        }
+        if (!this.getValue().equals(a.getValue())) {
+            return false;
+        }
+        return true;
     }
 }
