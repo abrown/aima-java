@@ -1,43 +1,66 @@
 package aima.core.learning.learners;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
 import aima.core.util.Util;
+import java.util.ArrayList;
 
 /**
+ * Not directly explained in AIMAv3, but indirectly referenced by the majority
+ * function, page 731, and the randomized weighted majority algorithm, page 758.
+ * This learner simply finds the most common result for the example set and
+ * adopts it as its own.
+ *
  * @author Ravi Mohan
- * 
+ * @author Andrew Brown
  */
-public class MajorityLearner implements Learner {
+public class MajorityLearner<E> implements Learner {
 
-	private String result;
+    private E result;
 
-	public void train(DataSet ds) {
-		List<String> targets = new ArrayList<String>();
-		for (Example e : ds.examples) {
-			targets.add(e.targetValue());
-		}
-		result = Util.mode(targets);
-	}
+    /**
+     * Train this learner to return the most common example output.
+     *
+     * @param examples
+     */
+    public void train(DataSet examples) {
+        ArrayList<E> results = new ArrayList<E>();
+        for (Example e : examples) {
+            results.add((E) e.getOutput());
+        }
+        this.result = Util.mode(results);
+    }
 
-	public String predict(Example e) {
-		return result;
-	}
+    /**
+     * Predict an outcome for this example; return the most common value seen
+     * thus far
+     *
+     * @param e
+     * @return
+     */
+    public E predict(Example e) {
+        if (this.result == null) {
+            throw new RuntimeException("MajorityLearner has not yet been trained.");
+        }
+        return this.result;
+    }
 
-	public int[] test(DataSet ds) {
-		int[] results = new int[] { 0, 0 };
-
-		for (Example e : ds.examples) {
-			if (e.targetValue().equals(result)) {
-				results[0] = results[0] + 1;
-			} else {
-				results[1] = results[1] + 1;
-			}
-		}
-		return results;
-	}
+    /**
+     * Returns the accuracy of the hypothesis on the specified set of examples
+     *
+     * @param test_set the test data set.
+     * @return the accuracy of the hypothesis on the specified set of examples
+     * as an array like [#correct, #incorrect]
+     */
+    public int[] test(DataSet test_set) {
+        int[] results = new int[]{0, 0};
+        for (Example e : test_set) {
+            if (e.getOutput().equals(this.result)) {
+                results[0]++;
+            } else {
+                results[1]++;
+            }
+        }
+        return results;
+    }
 }
