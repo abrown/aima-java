@@ -15,17 +15,19 @@ import aima.core.logic.fol.parsing.ast.Predicate;
 
 /**
  * Implements the CURRENT-BEST-LEARNING algorithm from page 771, AIMAv3. The
- * algorithm works by creating hypotheses (in essence, first order logic sentences)
- * that are compared with examples (also sentences). In this class, we use
- * Hypothesis to represent the FOL hypotheses and FOLExample to convert 
+ * algorithm works by creating hypotheses (in essence, first order logic
+ * sentences) that are compared with examples (also sentences). In this class,
+ * we use Hypothesis to represent the FOL hypotheses and FOLExample to convert
  * the common Example class to FOL.
+ *
  * @author Ciaran O'Reilly
  * @author Andrew Brown
  */
 public class CurrentBestLearner implements Learner {
 
     /**
-     * The predicate we are seeking to learn how to classify; e.g. "WillWait" on page 770, AIMAv3
+     * The predicate we are seeking to learn how to classify; e.g. "WillWait" on
+     * page 770, AIMAv3
      */
     private String classificationPredicate;
     /**
@@ -43,19 +45,20 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Constructor
-     * @param classificationPredicate the predicate we are seeking to learn how to classify; e.g. "WillWait"
+     *
+     * @param classificationPredicate the predicate we are seeking to learn how
+     * to classify; e.g. "WillWait"
      */
     public CurrentBestLearner(String classificationPredicate) {
         this.classificationPredicate = classificationPredicate;
     }
 
     /**
-     * Artificial Intelligence A Modern Approach (3rd Edition): Figure 19.2, page
-     * 771.<br/>
-     * <br/>
+     * Artificial Intelligence A Modern Approach (3rd Edition): Figure 19.2,
+     * page 771.<br/> <br/>
      * <pre>
      * function CURRENT-BEST-LEARNING(examples, h) returns a hypothesis or fail
-     * 
+     *
      *   if examples is empty then
      *      return h
      *   e &lt;- FIRST(examples)
@@ -71,11 +74,11 @@ public class CurrentBestLearner implements Learner {
      *       if h'' != fail then return h''
      *   return fail
      * </pre>
-     * 
-     * Figure 19.2 The current-best-hypothesis learning algorithm. It searches for a
-     * consistent hypothesis that fits all the examples and backtracks when no
-     * consistent specialization/generalization can be found. To start the
-     * algorithm, any hypothesis can be passed in; it will be specialized or
+     *
+     * Figure 19.2 The current-best-hypothesis learning algorithm. It searches
+     * for a consistent hypothesis that fits all the examples and backtracks
+     * when no consistent specialization/generalization can be found. To start
+     * the algorithm, any hypothesis can be passed in; it will be specialized or
      * generalized as needed.
      */
     public Hypothesis currentBestLearning(DataSet examples, Hypothesis h) {
@@ -105,9 +108,10 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Determine whether the example is consistent with the hypothesis
+     *
      * @param example
      * @param hypothesis
-     * @return 
+     * @return
      */
     public boolean isConsistentWith(FOLExample example, Hypothesis hypothesis) {
         if (hypothesis == null) {
@@ -120,7 +124,7 @@ public class CurrentBestLearner implements Learner {
         // infer
         InferenceResult result = kb.ask(example.toClassification());
         // return
-        if (result.isTrue() && example.getOutput() != null ) {
+        if (result.isTrue() && example.getOutput() != null) {
             return true;
         }
         return false;
@@ -128,9 +132,10 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Determine whether the hypothesis returns a false positive
+     *
      * @param example
      * @param hypothesis
-     * @return 
+     * @return
      */
     public boolean isFalsePositive(FOLExample example, Hypothesis hypothesis) {
         if (hypothesis == null) {
@@ -143,7 +148,7 @@ public class CurrentBestLearner implements Learner {
         // infer
         InferenceResult result = kb.ask(example.toClassification());
         // return
-        if (result.isTrue() && example.getOutput() == null ) {
+        if (result.isTrue() && example.getOutput() == null) {
             return true;
         }
         return false;
@@ -151,9 +156,10 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Determine whether the hypothesis returns a false negative
+     *
      * @param example
      * @param hypothesis
-     * @return 
+     * @return
      */
     public boolean isFalseNegative(FOLExample example, Hypothesis hypothesis) {
         if (hypothesis == null) {
@@ -166,17 +172,18 @@ public class CurrentBestLearner implements Learner {
         // infer
         InferenceResult result = kb.ask(example.toClassification());
         // return
-        if (!result.isTrue() && example.getOutput() != null ) {
+        if (!result.isTrue() && example.getOutput() != null) {
             return true;
         }
         return false;
     }
 
     /**
-     * Return 
+     * Return
+     *
      * @param hypothesis
      * @param examples
-     * @return 
+     * @return
      */
     public Hypothesis[] specialize(Hypothesis hypothesis, DataSet examples) {
         /**
@@ -187,14 +194,15 @@ public class CurrentBestLearner implements Learner {
 
     public Hypothesis[] generalize(Hypothesis hypothesis, DataSet examples) {
         /**
-         * @todo 
+         * @todo
          */
         return null;
     }
 
     /**
      * Train this learner to correctly classify the set of examples
-     * @param examples 
+     *
+     * @param examples
      */
     @Override
     public void train(DataSet examples) {
@@ -207,8 +215,9 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Predict an outcome based on the currently-held best hypothesis
+     *
      * @param example
-     * @return 
+     * @return
      */
     @Override
     public String predict(Example example) {
@@ -236,8 +245,9 @@ public class CurrentBestLearner implements Learner {
 
     /**
      * Returns an array of matches and failures, like [#correct, #incorrect].
+     *
      * @param examples
-     * @return 
+     * @return
      */
     @Override
     public int[] test(DataSet examples) {
@@ -260,8 +270,9 @@ public class CurrentBestLearner implements Learner {
     /**
      * Creates the FOL domain based on the set of examples; @todo potential
      * issue when the data set does not contain all constants/predicates
+     *
      * @param examples
-     * @return 
+     * @return
      */
     private FOLDomain getDomain(DataSet examples) {
         // setup
