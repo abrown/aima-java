@@ -1,9 +1,9 @@
 package aima.core.learning.inductive;
 
 import aima.core.learning.framework.Attribute;
-import java.util.HashMap;
 import aima.core.learning.framework.Example;
 import aima.core.util.Util;
+import java.util.HashMap;
 
 /**
  * Represents a decision tree, figure 18.2, page 699, AIMAv3. The book 
@@ -91,13 +91,13 @@ public class DecisionTree<E> {
      * @param e
      * @return 
      */
-    public Object predict(Example e) {
+    public E predict(Example e) {
         // setup
         String attributeName = this.getAttribute().getName();
         E attributeValue = (E) e.get(attributeName).getValue();
         // match
         if (this.branches.containsKey(attributeValue)) {
-            return this.branches.get(attributeValue).predict(e); // continue down tree
+            return (E) this.branches.get(attributeValue).predict(e); // continue down tree
         } else {
             throw new RuntimeException("No branch for value: " + attributeValue);
         }

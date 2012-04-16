@@ -52,7 +52,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree<E> {
      * @return 
      */
     @Override
-    public Object predict(Example e) {
+    public E predict(Example e) {
         return value;
     }
 
