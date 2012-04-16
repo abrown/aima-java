@@ -1,4 +1,5 @@
 package aima.core.learning.learners;
+
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
@@ -8,8 +9,8 @@ import java.util.ArrayList;
 /**
  * Not directly explained in AIMAv3, but indirectly referenced by the majority
  * function, page 731, and the randomized weighted majority algorithm, page 758.
- * This learner simply finds the most common result for the example set and
- * adopts it as its own.
+ * Used by PLURALITY-VALUE in DecisionTreeLearner. This learner simply finds the
+ * most common result for the example set and adopts it as its own.
  *
  * @author Ravi Mohan
  * @author Andrew Brown
@@ -23,6 +24,7 @@ public class MajorityLearner<E> implements Learner {
      *
      * @param examples
      */
+    @Override
     public void train(DataSet examples) {
         ArrayList<E> results = new ArrayList<E>();
         for (Example e : examples) {
@@ -38,6 +40,7 @@ public class MajorityLearner<E> implements Learner {
      * @param e
      * @return
      */
+    @Override
     public E predict(Example e) {
         if (this.result == null) {
             throw new RuntimeException("MajorityLearner has not yet been trained.");
@@ -52,6 +55,7 @@ public class MajorityLearner<E> implements Learner {
      * @return the accuracy of the hypothesis on the specified set of examples
      * as an array like [#correct, #incorrect]
      */
+    @Override
     public int[] test(DataSet test_set) {
         int[] results = new int[]{0, 0};
         for (Example e : test_set) {

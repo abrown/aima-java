@@ -4,18 +4,29 @@ import aima.core.learning.framework.DataSet;
 import aima.core.learning.inductive.DecisionTree;
 
 /**
+ * Used by ADA-BOOST as a hypothesis, page 750, AIMAv3.
+ *
  * @author Ravi Mohan
- * 
+ * @author Andrew Brown
  */
 public class StumpLearner extends DecisionTreeLearner {
 
-	public StumpLearner(DecisionTree sl, String unable_to_classify) {
-		super(sl, unable_to_classify);
-	}
+    /**
+     * Constructor
+     *
+     * @param tree
+     */
+    public StumpLearner(DecisionTree tree) {
+        super(tree);
+    }
 
-	@Override
-	public void train(DataSet ds) {
-		// System.out.println("Stump learner training");
-		// do nothing the stump is not inferred from the dataset
-	}
+    /**
+     * Train the stump; this does nothing because no training is needed
+     *
+     * @param ds
+     */
+    @Override
+    public void train(DataSet ds) {
+        // do nothing: the stump is not inferred from the dataset
+    }
 }
