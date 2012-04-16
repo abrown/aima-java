@@ -8,6 +8,7 @@ import java.util.HashSet;
 
 /**
  * Provides methods for representing a set of learning examples
+ *
  * @author Ravi Mohan
  * @author Andrew Brown
  */
@@ -24,7 +25,8 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * Adds an example to the set
-     * @param e 
+     *
+     * @param e
      */
     public void add(Example e) {
         examples.add(e);
@@ -32,7 +34,8 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * Returns the size of the set
-     * @return 
+     *
+     * @return
      */
     public int size() {
         return examples.size();
@@ -40,18 +43,19 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * Returns the example given an index
+     *
      * @param number
-     * @return 
+     * @return
      */
     public Example getExample(int index) {
         return examples.get(index);
     }
 
     /**
-     * Removes the example given from the data set
-     * @todo remove this
+     * Removes the example given from the data set @todo remove this
+     *
      * @param e
-     * @return 
+     * @return
      */
     public DataSet remove(Example e) {
         DataSet ds = new DataSet();
@@ -64,14 +68,31 @@ public class DataSet implements Iterable<Example> {
     }
     
     /**
-     * Return all possible attributes (a name/value pair) in the given example
-     * set; by using a HashSet, no duplicates should exist.
+     * Find the examples that match the given attribute name/value pair
+     * @param attributeName
+     * @param attributeValue
      * @return 
      */
-    public HashSet<Attribute> getPossibleAttributes(){
+    public DataSet find(String attributeName, Object attributeValue){
+        DataSet ds = new DataSet();
+        for (Example e : examples) {
+            if (e.get(attributeName).getValue().equals(attributeValue)) {
+                ds.add(e);
+            }
+        }
+        return ds;
+    }
+
+    /**
+     * Return all possible attributes (a name/value pair) in the given example
+     * set; by using a HashSet, no duplicates should exist.
+     *
+     * @return
+     */
+    public HashSet<Attribute> getPossibleAttributes() {
         HashSet<Attribute> possibleAttributes = new HashSet<Attribute>();
-        for(Example e:this){
-            for(Attribute a:e.getAttributes()){
+        for (Example e : this) {
+            for (Attribute a : e.getAttributes()) {
                 possibleAttributes.add(a);
             }
         }
@@ -79,53 +100,98 @@ public class DataSet implements Iterable<Example> {
     }
 
     /**
-     * Returns the distribution
-     * @todo explain better...
-     * @return 
-     */
-    public double getInformationFor(String attributeName) {
-        HashMap<String, Integer> counts = new HashMap<String, Integer>();
-        for (Example e : examples) {
-            String val = e.get(attributeName).toString();
-            if (counts.containsKey(val)) {
-                counts.put(val, counts.get(val) + 1);
-            } else {
-                counts.put(val, 1);
-            }
-        }
-        double[] data = new double[counts.keySet().size()];
-        Iterator<Integer> iter = counts.values().iterator();
-        for (int i = 0; i < data.length; i++) {
-            data[i] = iter.next();
-        }
-        data = Util.normalize(data);
-        return Util.information(data);
-    }
-    
-    /**
-     * Splits the set by attribute
+     * Split the set by attribute; return a map from attribute value to example
+     * set.
+     *
      * @param attributeName
-     * @return 
+     * @return
      */
-    public HashMap<String, DataSet> splitByAttribute(String attributeName) {
-        HashMap<String, DataSet> results = new HashMap<String, DataSet>();
-        for (Example e : examples) {
-            String val = e.get(attributeName).toString();
-            if (results.containsKey(val)) {
-                results.get(val).add(e);
+    public HashMap<Object, DataSet> splitBy(String attributeName) {
+        HashMap<Object, DataSet> results = new HashMap<Object, DataSet>();
+        for (Example e : this.examples) {
+            Object attributeValue = e.get(attributeName).getValue();
+            if (results.containsKey(attributeValue)) {
+                results.get(attributeValue).add(e);
             } else {
                 DataSet ds = new DataSet();
                 ds.add(e);
-                results.put(val, ds);
+                results.put(attributeValue, ds);
             }
         }
         return results;
     }
+    
+    /**
+     * Return each value for this attribute in the example set
+     * @param attributeName
+     * @return 
+     */
+    public HashSet<Object> getValuesOf(String attributeName){
+        HashSet<Object> values = new HashSet<Object>();
+        for(Example e : this.examples){
+            values.add(e.get(attributeName).getValue());
+        }
+        return values;
+    }
+
+    /**
+     * Calculate entropy of an attribute in the example set; see description of
+     * process on page 704, AIMAv3. Used by DecisionTreeLearner. Does not use
+     * Util.information() as this method is vaguely named and does not fully
+     * conform to formula on page 704.
+     *
+     * @return
+     */
+    public double getEntropyOf(String attributeName) {
+        HashMap<Object, Integer> distribution = new HashMap<Object, Integer>();
+        // count number of values v_k for variable V, page 704
+        for (Example e : examples) {
+            Object value = e.get(attributeName).getValue();
+            if (distribution.containsKey(value)) {
+                distribution.put(value, distribution.get(value) + 1);
+            } else {
+                distribution.put(value, 1);
+            }
+        }
+        // normalize probability distribution, see page 493
+        double[] normalizedDistribution = new double[distribution.keySet().size()];
+        Iterator<Integer> iter = distribution.values().iterator();
+        for (int i = 0; i < normalizedDistribution.length; i++) {
+            normalizedDistribution[i] = iter.next();
+        }
+        normalizedDistribution = Util.normalize(normalizedDistribution);
+        // calculate entropy H(V), page 704		
+        double total = 0.0;
+        for (double d : normalizedDistribution) {
+            total += d * Util.log2(d);
+        }
+        return -1.0 * total;
+    }
+
+    /**
+     * Calculate information gain--the expected reduction in entropy--after 
+     * testing the given attribute; see page 704, AIMAv3. Used in
+     * DecisionTreeLearner.
+     * @param attributeName
+     * @return 
+     */
+    public double getInformationGainOf(String attributeName) {
+        HashMap<Object, DataSet> attributeValueMap = this.splitBy(attributeName);
+        double totalSize = this.examples.size();
+        double remainder = 0.0;
+        for (Object attributeValue : attributeValueMap.keySet()) {
+            // @todo "matchingValueSize" does not conform exactly to "p_k + p_n" described on page 704
+            double matchingValueSize = attributeValueMap.get(attributeValue).size();
+            remainder += (matchingValueSize / totalSize) * attributeValueMap.get(attributeValue).getEntropyOf(attributeName);
+        }
+        return this.getEntropyOf(attributeName) - remainder;
+    }
 
     /**
      * Overrides equals() to compare with uncast Object
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object o) {
@@ -141,7 +207,8 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * For use in equals()
-     * @return 
+     *
+     * @return
      */
     @Override
     public int hashCode() {
@@ -150,7 +217,8 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * Iterator
-     * @return 
+     *
+     * @return
      */
     @Override
     public Iterator<Example> iterator() {
@@ -159,7 +227,8 @@ public class DataSet implements Iterable<Example> {
 
     /**
      * Copies this set to a new object
-     * @return 
+     *
+     * @return
      */
     public DataSet copy() {
         DataSet ds = new DataSet();
@@ -168,92 +237,4 @@ public class DataSet implements Iterable<Example> {
         }
         return ds;
     }
-
-//    /**
-//     * @todo explain better
-//     * @param parameterName
-//     * @return 
-//     */
-//    public double calculateGainFor(String parameterName) {
-//        HashMap<String, DataSet> hash = splitByAttribute(parameterName);
-//        double totalSize = examples.size();
-//        double remainder = 0.0;
-//        for (String parameterValue : hash.keySet()) {
-//            double reducedDataSetSize = hash.get(parameterValue).examples.size();
-//            remainder += (reducedDataSetSize / totalSize)
-//                    * hash.get(parameterValue).getInformationFor();
-//        }
-//        return getInformationFor() - remainder;
-//    }
-//    /**
-//     * Returns the attribute names
-//     * @return 
-//     */
-//    public List<String> getAttributeNames() {
-//        return specification.getAttributeNames();
-//    }
-//
-//    /**
-//     * Returns the target attribute name
-//     * @return 
-//     */
-//    public String getTargetAttributeName() {
-//        return specification.getTarget();
-//    }
-//
-//    /**
-//     * Returns a new empty data set
-//     * @todo move to factory
-//     * @return 
-//     */
-//    public DataSet emptyDataSet() {
-//        return new DataSet(specification);
-//    }
-//
-//    /**
-//     * Sets the specification for this object
-//     * @todo remove this
-//     * @param specification the specification to set. USE SPARINGLY for testing 
-//     * etc .. makes no semantic sense
-//     */
-//    public void setSpecification(DataSetSpecification specification) {
-//        this.specification = specification;
-//    }
-//
-//    /**
-//     * Wrapper for specification.getPossibleAttributeValues()
-//     * @todo remove this
-//     * @param attributeName
-//     * @return 
-//     */
-//    public List<String> getPossibleAttributeValues(String attributeName) {
-//        return specification.getPossibleAttributeValues(attributeName);
-//    }
-//
-//    /**
-//     * Filters the set, returning only the results that match the given 
-//     * attribute name and value
-//     * @todo rename as filter()
-//     * @param attributeName
-//     * @param attributeValue
-//     * @return 
-//     */
-//    public DataSet matchingDataSet(String attributeName, String attributeValue) {
-//        DataSet ds = new DataSet(specification);
-//        for (Example e : examples) {
-//            if (e.getAttributeValueAsString(attributeName).equals(
-//                    attributeValue)) {
-//                ds.add(e);
-//            }
-//        }
-//        return ds;
-//    }
-//
-//    /**
-//     * Returns all attributes that are not the target
-//     * @return 
-//     */
-//    public List<String> getNonTargetAttributes() {
-//        return Util.removeFrom(getAttributeNames(), getTargetAttributeName());
-//    }
 }
