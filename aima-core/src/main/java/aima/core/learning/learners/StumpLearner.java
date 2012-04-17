@@ -13,6 +13,13 @@ public class StumpLearner extends DecisionTreeLearner {
 
     /**
      * Constructor
+     */
+    public StumpLearner(){
+        super();
+    }
+    
+    /**
+     * Constructor
      *
      * @param tree
      */
