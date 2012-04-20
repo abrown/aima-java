@@ -31,7 +31,7 @@ public class DecisionList {
      * @param example
      * @return true on match; false otherwise
      */
-    public Object predict(Example example) {
+    public <T> T predict(Example example) {
         // test size
         if (this.tests.isEmpty()) {
             return null;
@@ -39,7 +39,7 @@ public class DecisionList {
         // test each outcome
         for (DecisionListTest test : this.tests) {
             if (test.matches(example)) {
-                return test.getOutput();
+                return (T) test.getOutput();
             }
         }
         // default
@@ -53,7 +53,15 @@ public class DecisionList {
      * @param outcome
      */
     public void add(DecisionListTest test) {
-        tests.add(test);
+        this.tests.add(test);
+    }
+    
+    /**
+     * Return number of tests in this decision list
+     * @return 
+     */
+    public int size(){
+        return this.tests.size();
     }
 
     /**
@@ -87,9 +95,11 @@ public class DecisionList {
         s.append("IF ");
         for (DecisionListTest test : this.tests) {
             s.append(test);
-            s.append(" THEN true ELSE ");
+            s.append(" THEN ");
+            s.append(test.getOutput());
+            s.append(" ELSE ");
         }
-        s.append("false");
+        s.append("null");
         return s.toString();
     }
 }
