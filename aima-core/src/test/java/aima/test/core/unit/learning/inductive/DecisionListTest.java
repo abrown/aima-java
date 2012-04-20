@@ -5,6 +5,7 @@ import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.inductive.DecisionList;
 import aima.test.core.unit.learning.framework.DataSetTest;
+import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +35,13 @@ public class DecisionListTest {
     @Test
     public void testPredict() {
         // get restaurant data
-        DataSet restaurant = DataSetTest.loadRestaurantData();
+        DataSet restaurant = null;
+        try{
+            DataSetTest.loadRestaurantData();
+        }
+        catch(IOException e){
+            Assert.fail("Could not load restaurant data from URL.");
+        }
         // create decision list test on two attributes: Price and Est
         aima.core.learning.inductive.DecisionListTest<String> t = new aima.core.learning.inductive.DecisionListTest();
         t.add(new Attribute<String>("Price", "$$$"));

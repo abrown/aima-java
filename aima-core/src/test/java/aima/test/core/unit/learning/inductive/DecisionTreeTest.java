@@ -6,6 +6,7 @@ import aima.core.learning.framework.Example;
 import aima.core.learning.inductive.DecisionTree;
 import aima.core.learning.inductive.DecisionTreeLeaf;
 import aima.test.core.unit.learning.framework.DataSetTest;
+import java.io.IOException;
 import java.util.HashMap;
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -27,7 +28,12 @@ public class DecisionTreeTest {
     @Test
     public void testPredict() {
         // get restaurant data
-        DataSet restaurant = DataSetTest.loadRestaurantData();
+        DataSet restaurant = null;
+        try {
+            DataSetTest.loadRestaurantData();
+        } catch (IOException e) {
+            Assert.fail("Could not load restaurant data from URL.");
+        }
         // create tree
         DecisionTree t = new DecisionTree<String>(new Attribute<String>("Price", null));
         t.addBranch("$", new DecisionTreeLeaf("No"));
