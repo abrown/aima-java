@@ -14,24 +14,26 @@ import java.util.Arrays;
  */
 public class AdaBoostLearner implements Learner {
 
-    private Learner learner = new StumpLearner(); // defaulted to page 750
-    private int learnerCount = 5; // defaulted to page 750
+    private Class<? extends Learner> learnerType;
+    private int learnerCount;
     private WeightedMajorityLearner ensemble;
 
     /**
-     * Constructor
+     * Constructor; uses page 750 defaults
      */
     public AdaBoostLearner() {
+        this.learnerType = StumpLearner.class;
+        this.learnerCount = 5;
     }
 
     /**
      * Constructor
      *
-     * @param learner
+     * @param learnerType
      * @param learnerCount
      */
-    public AdaBoostLearner(Learner learner, int learnerCount) {
-        this.learner = learner;
+    public AdaBoostLearner(Class<? extends Learner> learnerType, int learnerCount) {
+        this.learnerType = learnerType;
         this.learnerCount = learnerCount;
     }
 
@@ -60,16 +62,20 @@ public class AdaBoostLearner implements Learner {
      *
      * @param examples
      */
-    public WeightedMajorityLearner adaBoost(DataSet examples, Learner L, int K) {
+    public WeightedMajorityLearner adaBoost(DataSet examples, Class<? extends Learner> L, int K) {
         // initialize local variables
         int N = examples.size();
         double[] w = new double[N];
         Arrays.fill(w, 1 / N);
         Learner[] h = new Learner[K];
+        try {
+            Arrays.fill(h, L.getConstructor().newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         double[] z = new double[K];
         // for each K
         for (int k = 1; k <= K; k++) {
-            h[k] = L;
             double error = 0;
             for (int j = 1; j <= N; j++) {
                 Object x_j = h[k].predict(examples.getExample(j));
@@ -89,7 +95,7 @@ public class AdaBoostLearner implements Learner {
             z[k] = Math.log((1 - error) / error);
         }
         // return
-        return new WeightedMajorityLearner<Boolean>(h, z);
+        return new WeightedMajorityLearner(h, z);
     }
 
     /**
@@ -99,7 +105,7 @@ public class AdaBoostLearner implements Learner {
      */
     @Override
     public void train(DataSet examples) {
-        this.ensemble = this.adaBoost(examples, this.learner, this.learnerCount);
+        this.ensemble = this.adaBoost(examples, this.learnerType, this.learnerCount);
     }
 
     /**
