@@ -14,6 +14,7 @@ import org.junit.Test;
 
 /**
  * DataSetTest
+ *
  * @author Ravi Mohan
  * @author Andrew Brown
  */
@@ -157,13 +158,52 @@ public class DataSetTest {
         // @todo
     }
 
+    @Test
+    public void testLoadFrom() {
+        try {
+            // load restaurant data
+            DataSet restaurants = DataSetTest.loadRestaurantData();
+            // test
+            Assert.assertEquals("No", restaurants.getExample(1).getOutput());
+            Assert.assertEquals("Burger", restaurants.getExample(11).get("Type").getValue());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail("Failed to retrieve data: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Check mean and standard deviation with data at
+     * http://aima-data.googlecode.com/svn/trunk/iris.txt
+     */
+    @Test
+    public void testDeviationAndMean() {
+        try {
+            // prepare
+            DataSet iris = DataSetTest.loadIrisData();
+            ArrayList<Double> sepalLengths = new ArrayList<Double>();
+            for (Example e : iris) {
+                Attribute<Double> a = e.get("sepal-length");
+                sepalLengths.add(a.getValue());
+            }
+            double sepalLengthMean = Util.calculateMean(sepalLengths);
+            double sepalLengthDeviation = Util.calculateStDev(sepalLengths, sepalLengthMean);
+            // test
+            Assert.assertEquals(5.84, sepalLengthMean, 0.01);
+            Assert.assertEquals(0.83, sepalLengthDeviation, 0.01);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail("Failed to retrieve data: " + e.getMessage());
+        }
+    }
+
     /**
      * Demonstate loading an example set from a URL; uses the trunk version of
      * aima-data found at
      * http://aima-data.googlecode.com/svn/trunk/restaurant.csv.
      */
-    @Test
-    public void testLoadFromFile() {
+    public static DataSet loadRestaurantData() throws IOException {
         // create restaurant sample; used example[0] from page 700, AIMAv3
         Example<String> sample = new Example();
         sample.add(new Attribute<String>("Alt", "Yes"));
@@ -178,26 +218,17 @@ public class DataSetTest {
         sample.add(new Attribute<String>("Est", "0-10"));
         sample.setOutput("Yes");
         // load restaurant data
-        DataSet restaurants = new DataSet();
-        try {
-            URL url = new URL("http://aima-data.googlecode.com/svn/trunk/restaurant.csv");
-            restaurants = DataSet.loadFrom(url, ",", sample);
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
-        // test
-        Assert.assertEquals("No", restaurants.getExample(1).getOutput());
-        Assert.assertEquals("Burger", restaurants.getExample(11).get("Type").getValue());
+        URL url = new URL("http://aima-data.googlecode.com/svn/trunk/restaurant.csv");
+        DataSet restaurants = DataSet.loadFrom(url, ",", sample);
+        // return
+        return restaurants;
     }
 
     /**
-     * Test standard deviation and mean for the iris data set available with
-     * aima-data; see http://aima-data.googlecode.com/svn/trunk/iris.csv for
-     * more information; checks mean with data at
-     * http://aima-data.googlecode.com/svn/trunk/iris.txt
+     * Demonstate loading an example set from a URL; uses the trunk version of
+     * aima-data found at http://aima-data.googlecode.com/svn/trunk/iris.csv.
      */
-    @Test
-    public void testDeviationAndMean() {
+    public static DataSet loadIrisData() throws IOException {
         // create iris sample
         Example<String> sample = new Example();
         sample.add(new Attribute<Double>("sepal-length", 0.0));
@@ -205,24 +236,10 @@ public class DataSetTest {
         sample.add(new Attribute<Double>("petal-length", 0.0));
         sample.add(new Attribute<Double>("petal-width", 0.0));
         sample.setOutput("...");
-        // load restaurant data
-        DataSet iris = new DataSet();
-        try {
-            URL url = new URL("http://aima-data.googlecode.com/svn/trunk/iris.csv");
-            iris = DataSet.loadFrom(url, ",", sample);
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
-        }
-        // prepare
-        ArrayList<Double> sepalLengths = new ArrayList<Double>();
-        for(Example e: iris){
-            Attribute<Double> a = e.get("sepal-length");
-            sepalLengths.add(a.getValue());
-        }
-        double sepalLengthMean = Util.calculateMean(sepalLengths);
-        double sepalLengthDeviation = Util.calculateStDev(sepalLengths, sepalLengthMean);
-        // test
-        Assert.assertEquals(5.84, sepalLengthMean, 0.01);
-        Assert.assertEquals(0.83, sepalLengthDeviation, 0.01);
+        // load iris data
+        URL url = new URL("http://aima-data.googlecode.com/svn/trunk/iris.csv");
+        DataSet iris = DataSet.loadFrom(url, ",", sample);
+        // return
+        return iris;
     }
 }
