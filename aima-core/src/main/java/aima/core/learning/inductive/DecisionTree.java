@@ -32,7 +32,7 @@ public class DecisionTree<E> {
     /**
      * Constructor
      */
-    protected DecisionTree() {
+    public DecisionTree() {
     }
 
     /**
@@ -82,7 +82,7 @@ public class DecisionTree<E> {
      * @param value
      * @param tree 
      */
-    public void addNode(E value, DecisionTree tree) {
+    public void addBranch(E value, DecisionTree tree) {
         this.branches.put(value, tree);
     }
 
@@ -109,7 +109,7 @@ public class DecisionTree<E> {
      */
     @Override
     public String toString() {
-        return toString(1, new StringBuilder());
+        return toString(0, new StringBuilder());
     }
 
     /**
@@ -120,15 +120,24 @@ public class DecisionTree<E> {
      */
     public String toString(int depth, StringBuilder s) {
         if (this.getAttribute().getName() != null) {
-            s.append(Util.ntimes("\t", depth));
-            s.append(Util.ntimes("***", 1));
-            s.append(this.getAttribute().getName() + " \n");
+            s.append(Util.ntimes("  ", depth));
+            s.append("|- ");
+            s.append(this.getAttribute().getName());
+            s.append("\n");
             for (E attributeValue : this.branches.keySet()) {
-                s.append(Util.ntimes("\t", depth + 1));
-                s.append("+" + attributeValue);
-                s.append("\n");
+                s.append(Util.ntimes("  ", depth + 1));
+                s.append("|- ");
+                s.append(attributeValue);
                 DecisionTree child = this.branches.get(attributeValue);
-                s.append(child.toString(depth + 1, new StringBuilder()));
+                if( child instanceof DecisionTreeLeaf){
+                    s.append(" -> ");
+                    s.append(child);
+                    s.append("\n");
+                }
+                else{
+                    s.append("\n");
+                    s.append(child.toString(depth + 1, new StringBuilder()));
+                }
             }
         }
         return s.toString();
