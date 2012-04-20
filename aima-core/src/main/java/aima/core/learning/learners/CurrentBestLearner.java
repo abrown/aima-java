@@ -5,7 +5,7 @@ import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
 import aima.core.learning.knowledge.FOLExample;
-import aima.core.learning.knowledge.Hypothesis;
+import aima.core.learning.knowledge.FOLHypothesis;
 import aima.core.logic.fol.domain.FOLDomain;
 import aima.core.logic.fol.inference.FOLOTTERLikeTheoremProver;
 import aima.core.logic.fol.inference.InferenceResult;
@@ -33,7 +33,7 @@ public class CurrentBestLearner implements Learner {
     /**
      * The current best hypothesis that fits the example set
      */
-    private Hypothesis bestHypothesis;
+    private FOLHypothesis bestHypothesis;
     /**
      * The complete domain of all predicates and constants used in this data set
      */
@@ -81,7 +81,7 @@ public class CurrentBestLearner implements Learner {
      * the algorithm, any hypothesis can be passed in; it will be specialized or
      * generalized as needed.
      */
-    public Hypothesis currentBestLearning(DataSet examples, Hypothesis h) {
+    public FOLHypothesis currentBestLearning(DataSet examples, FOLHypothesis h) {
         if (examples.size() == 0) {
             return h;
         }
@@ -89,15 +89,15 @@ public class CurrentBestLearner implements Learner {
         if (isConsistentWith(e, h)) {
             return currentBestLearning(examples.remove(e), h);
         } else if (isFalsePositive(e, h)) {
-            for (Hypothesis h1 : specialize(h, examples)) {
-                Hypothesis h2 = currentBestLearning(examples.remove(e), h1);
+            for (FOLHypothesis h1 : specialize(h, examples)) {
+                FOLHypothesis h2 = currentBestLearning(examples.remove(e), h1);
                 if (h2 != null) {
                     return h2;
                 }
             }
         } else if (isFalseNegative(e, h)) {
-            for (Hypothesis h1 : generalize(h, examples)) {
-                Hypothesis h2 = currentBestLearning(examples.remove(e), h1);
+            for (FOLHypothesis h1 : generalize(h, examples)) {
+                FOLHypothesis h2 = currentBestLearning(examples.remove(e), h1);
                 if (h2 != null) {
                     return h2;
                 }
@@ -113,7 +113,7 @@ public class CurrentBestLearner implements Learner {
      * @param hypothesis
      * @return
      */
-    public boolean isConsistentWith(FOLExample example, Hypothesis hypothesis) {
+    public boolean isConsistentWith(FOLExample example, FOLHypothesis hypothesis) {
         if (hypothesis == null) {
             return false;
         }
@@ -137,7 +137,7 @@ public class CurrentBestLearner implements Learner {
      * @param hypothesis
      * @return
      */
-    public boolean isFalsePositive(FOLExample example, Hypothesis hypothesis) {
+    public boolean isFalsePositive(FOLExample example, FOLHypothesis hypothesis) {
         if (hypothesis == null) {
             return false;
         }
@@ -161,7 +161,7 @@ public class CurrentBestLearner implements Learner {
      * @param hypothesis
      * @return
      */
-    public boolean isFalseNegative(FOLExample example, Hypothesis hypothesis) {
+    public boolean isFalseNegative(FOLExample example, FOLHypothesis hypothesis) {
         if (hypothesis == null) {
             return false;
         }
@@ -185,14 +185,14 @@ public class CurrentBestLearner implements Learner {
      * @param examples
      * @return
      */
-    public Hypothesis[] specialize(Hypothesis hypothesis, DataSet examples) {
+    public FOLHypothesis[] specialize(FOLHypothesis hypothesis, DataSet examples) {
         /**
          * @todo
          */
         return null;
     }
 
-    public Hypothesis[] generalize(Hypothesis hypothesis, DataSet examples) {
+    public FOLHypothesis[] generalize(FOLHypothesis hypothesis, DataSet examples) {
         /**
          * @todo
          */
