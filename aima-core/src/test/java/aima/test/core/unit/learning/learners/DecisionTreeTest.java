@@ -24,10 +24,10 @@ public class DecisionTreeTest {
     @Test
     public void testReturnOutputValue() {
         // setup
-        DecisionTree one = new DecisionTree("one");
-        DecisionTree two = new DecisionTree("two");
+        DecisionTree one = new DecisionTree(null);
+        DecisionTree two = new DecisionTree(null);
         String three = "...";
-        one.addNode("two", two);
+        one.addBranch("two", two);
         two.addLeaf("three", three);
         // test
     }
@@ -93,27 +93,27 @@ public class DecisionTreeTest {
         // from AIMA 2nd ED
         // Fig 18.6
         // friday saturday node
-        DecisionTree frisat = new DecisionTree("fri/sat");
+        DecisionTree frisat = new DecisionTree(null);
         frisat.addLeaf(Util.YES, Util.YES);
         frisat.addLeaf(Util.NO, Util.NO);
 
         // type node
-        DecisionTree type = new DecisionTree("type");
+        DecisionTree type = new DecisionTree(null);
         type.addLeaf("French", Util.YES);
         type.addLeaf("Italian", Util.NO);
-        type.addNode("Thai", frisat);
+        type.addBranch("Thai", frisat);
         type.addLeaf("Burger", Util.YES);
 
         // hungry node
-        DecisionTree hungry = new DecisionTree("hungry");
+        DecisionTree hungry = new DecisionTree(null);
         hungry.addLeaf(Util.NO, Util.NO);
-        hungry.addNode(Util.YES, type);
+        hungry.addBranch(Util.YES, type);
 
         // patrons node
-        DecisionTree patrons = new DecisionTree("patrons");
+        DecisionTree patrons = new DecisionTree(null);
         patrons.addLeaf("None", Util.NO);
         patrons.addLeaf("Some", Util.YES);
-        patrons.addNode("Full", hungry);
+        patrons.addBranch("Full", hungry);
 
         return patrons;
     }
@@ -123,52 +123,52 @@ public class DecisionTreeTest {
         // Fig 18.2
 
         // raining node
-        DecisionTree raining = new DecisionTree("raining");
+        DecisionTree raining = new DecisionTree(null);
         raining.addLeaf(Util.YES, Util.YES);
         raining.addLeaf(Util.NO, Util.NO);
 
         // bar node
-        DecisionTree bar = new DecisionTree("bar");
+        DecisionTree bar = new DecisionTree(null);
         bar.addLeaf(Util.YES, Util.YES);
         bar.addLeaf(Util.NO, Util.NO);
 
         // friday saturday node
-        DecisionTree frisat = new DecisionTree("fri/sat");
+        DecisionTree frisat = new DecisionTree(null);
         frisat.addLeaf(Util.YES, Util.YES);
         frisat.addLeaf(Util.NO, Util.NO);
 
         // second alternate node to the right of the diagram below hungry
-        DecisionTree alternate2 = new DecisionTree("alternate");
-        alternate2.addNode(Util.YES, raining);
+        DecisionTree alternate2 = new DecisionTree(null);
+        alternate2.addBranch(Util.YES, raining);
         alternate2.addLeaf(Util.NO, Util.YES);
 
         // reservation node
-        DecisionTree reservation = new DecisionTree("reservation");
-        frisat.addNode(Util.NO, bar);
+        DecisionTree reservation = new DecisionTree(null);
+        frisat.addBranch(Util.NO, bar);
         frisat.addLeaf(Util.YES, Util.YES);
 
         // first alternate node to the left of the diagram below waitestimate
-        DecisionTree alternate1 = new DecisionTree("alternate");
-        alternate1.addNode(Util.NO, reservation);
-        alternate1.addNode(Util.YES, frisat);
+        DecisionTree alternate1 = new DecisionTree(null);
+        alternate1.addBranch(Util.NO, reservation);
+        alternate1.addBranch(Util.YES, frisat);
 
         // hungry node
-        DecisionTree hungry = new DecisionTree("hungry");
+        DecisionTree hungry = new DecisionTree(null);
         hungry.addLeaf(Util.NO, Util.YES);
-        hungry.addNode(Util.YES, alternate2);
+        hungry.addBranch(Util.YES, alternate2);
 
         // wait estimate node
-        DecisionTree waitEstimate = new DecisionTree("wait_estimate");
+        DecisionTree waitEstimate = new DecisionTree(null);
         waitEstimate.addLeaf(">60", Util.NO);
-        waitEstimate.addNode("30-60", alternate1);
-        waitEstimate.addNode("10-30", hungry);
+        waitEstimate.addBranch("30-60", alternate1);
+        waitEstimate.addBranch("10-30", hungry);
         waitEstimate.addLeaf("0-10", Util.YES);
 
         // patrons node
-        DecisionTree patrons = new DecisionTree("patrons");
+        DecisionTree patrons = new DecisionTree(null);
         patrons.addLeaf("None", Util.NO);
         patrons.addLeaf("Some", Util.YES);
-        patrons.addNode("Full", waitEstimate);
+        patrons.addBranch("Full", waitEstimate);
 
         return patrons;
     }
