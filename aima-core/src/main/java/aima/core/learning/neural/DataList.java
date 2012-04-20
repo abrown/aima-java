@@ -75,4 +75,13 @@ public class DataList extends ArrayList<Double> {
         // return
         return errors / actual.size();
     }
+    
+    /**
+     * To Double Array
+     * @return 
+     */
+    @Override
+    public Double[] toArray(){
+        return this.toArray(new Double[1]);
+    }
 }
