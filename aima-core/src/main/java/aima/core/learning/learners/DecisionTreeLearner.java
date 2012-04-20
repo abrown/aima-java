@@ -86,7 +86,7 @@ public class DecisionTreeLearner implements Learner {
             DataSet exs = examples.find(A.getName(), value);
             attributeNames.remove(A.getName()); // attributes - A
             DecisionTree subtree = this.decisionTreeLearning(exs, attributeNames, examples);
-            tree.addNode(value, subtree);
+            tree.addBranch(value, subtree);
         }
         return tree;
     }
@@ -179,7 +179,7 @@ public class DecisionTreeLearner implements Learner {
     }
 
     /**
-     * Returns the accuracy of the decision tree on the specified set of
+     * Return the accuracy of the decision tree on the specified set of
      * examples
      *
      * @param examples
