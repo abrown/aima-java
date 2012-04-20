@@ -1,150 +1,228 @@
 package aima.test.core.unit.learning.framework;
 
 import aima.core.learning.framework.Attribute;
-import java.util.Arrays;
-import java.util.List;
-
+import aima.core.learning.framework.DataSet;
+import aima.core.learning.framework.Example;
+import aima.core.util.Util;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import aima.core.learning.framework.DataSet;
-import aima.core.learning.framework.DataSetFactory;
-import aima.core.learning.framework.Example;
-//import aima.core.learning.neural.IrisDataSetNumerizer;
-//import aima.core.learning.neural.Numerizer;
-//import aima.core.learning.neural.RabbitEyeDataSet;
-import aima.core.util.datastructure.Pair;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 /**
+ * DataSetTest
  * @author Ravi Mohan
- * 
+ * @author Andrew Brown
  */
 public class DataSetTest {
 
-    private static final String YES = "Yes";
-//    DataSetSpecification spec;
+    DataSet examples;
 
+    /**
+     * Setup a 50-count example set, each of the form: { "String": "...",
+     * "Number": 0.28489 (random), "Boolean": true (random), "Count": 17 (i) }
+     *
+     * @throws Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+        // sample data set creation
+        this.examples = new DataSet();
+        for (int i = 0; i < 50; i++) {
+            Example<Double> example = new Example<Double>();
+            // create attributes
+            Attribute<String> string = new Attribute<String>("String", "...");
+            example.add(string);
+            Attribute<Double> number = new Attribute<Double>("Number", Math.random());
+            example.add(number);
+            Attribute<Boolean> bool = new Attribute<Boolean>("Boolean", (Math.random() > 0.5));
+            example.add(bool);
+            Attribute<Integer> count = new Attribute<Integer>("Count", i);
+            example.add(count);
+            // create output
+            example.setOutput((Double) Math.random());
+            // add to set
+            this.examples.add(example);
+        }
+    }
 
-//    @Test
-//    public void testNormalizationOfFileBasedDataProducesCorrectMeanStdDevAndNormalizedValues()
-//            throws Exception {
-//        RabbitEyeDataSet reds = new RabbitEyeDataSet();
-//        reds.createNormalizedDataFromFile("rabbiteyes");
-//
-//        List<Double> means = reds.getMeans();
-//        Assert.assertEquals(2, means.size());
-//        Assert.assertEquals(244.771, means.get(0), 0.001);
-//        Assert.assertEquals(145.505, means.get(1), 0.001);
-//
-//        List<Double> stdev = reds.getStdevs();
-//        Assert.assertEquals(2, stdev.size());
-//        Assert.assertEquals(213.554, stdev.get(0), 0.001);
-//        Assert.assertEquals(65.776, stdev.get(1), 0.001);
-//
-//        List<List<Double>> normalized = reds.getNormalizedData();
-//        Assert.assertEquals(70, normalized.size());
-//
-//        // check first value
-//        Assert.assertEquals(-1.0759, normalized.get(0).get(0), 0.001);
-//        Assert.assertEquals(-1.882, normalized.get(0).get(1), 0.001);
-//
-//        // check last Value
-//        Assert.assertEquals(2.880, normalized.get(69).get(0), 0.001);
-//        Assert.assertEquals(1.538, normalized.get(69).get(1), 0.001);
-//    }
-//
-//    @Test
-//    public void testExampleFormation() throws Exception {
-//        RabbitEyeDataSet reds = new RabbitEyeDataSet();
-//        reds.createExamplesFromFile("rabbiteyes");
-//        Assert.assertEquals(70, reds.howManyExamplesLeft());
-//        reds.getExampleAtRandom();
-//        Assert.assertEquals(69, reds.howManyExamplesLeft());
-//        reds.getExampleAtRandom();
-//        Assert.assertEquals(68, reds.howManyExamplesLeft());
-//    }
-//
-//    @Test
-//    public void testLoadsDatasetFile() throws Exception {
-//
-//        DataSet ds = DataSetFactory.getRestaurantDataSet();
-//        Assert.assertEquals(12, ds.size());
-//
-//        Example first = ds.getExample(0);
-//        Assert.assertEquals(YES, first.getAttributeValueAsString("alternate"));
-//        Assert.assertEquals("$$$", first.getAttributeValueAsString("price"));
-//        Assert.assertEquals("0-10",
-//                first.getAttributeValueAsString("wait_estimate"));
-//        Assert.assertEquals(YES, first.getAttributeValueAsString("will_wait"));
-//        Assert.assertEquals(YES, first.targetValue());
-//    }
-//
-//    @Test(expected = Exception.class)
-//    public void testThrowsExceptionForNonExistentFile() throws Exception {
-//        new DataSetFactory().fromFile("nonexistent", null, null);
-//    }
-//
-//    @Test
-//    public void testLoadsIrisDataSetWithNumericAndStringAttributes()
-//            throws Exception {
-//        DataSet ds = DataSetFactory.getIrisDataSet();
-//        Example first = ds.getExample(0);
-//        Assert.assertEquals("5.1",
-//                first.getAttributeValueAsString("sepal_length"));
-//    }
-//
-//    @Test
-//    public void testNonDestructiveRemoveExample() throws Exception {
-//        DataSet ds1 = DataSetFactory.getRestaurantDataSet();
-//        DataSet ds2 = ds1.remove(ds1.getExample(0));
-//        Assert.assertEquals(12, ds1.size());
-//        Assert.assertEquals(11, ds2.size());
-//    }
-//
-//    @Test
-//    public void testNumerizesAndDeNumerizesIrisDataSetExample1()
-//            throws Exception {
-//        DataSet ds = DataSetFactory.getIrisDataSet();
-//        Example first = ds.getExample(0);
-//        Numerizer n = new IrisDataSetNumerizer();
-//        Pair<List<Double>, List<Double>> io = n.numerize(first);
-//
-//        Assert.assertEquals(Arrays.asList(5.1, 3.5, 1.4, 0.2), io.getFirst());
-//        Assert.assertEquals(Arrays.asList(0.0, 0.0, 1.0), io.getSecond());
-//
-//        String plant_category = n.denumerize(Arrays.asList(0.0, 0.0, 1.0));
-//        Assert.assertEquals("setosa", plant_category);
-//    }
-//
-//    @Test
-//    public void testNumerizesAndDeNumerizesIrisDataSetExample2()
-//            throws Exception {
-//        DataSet ds = DataSetFactory.getIrisDataSet();
-//        Example first = ds.getExample(51);
-//        Numerizer n = new IrisDataSetNumerizer();
-//        Pair<List<Double>, List<Double>> io = n.numerize(first);
-//
-//        Assert.assertEquals(Arrays.asList(6.4, 3.2, 4.5, 1.5), io.getFirst());
-//        Assert.assertEquals(Arrays.asList(0.0, 1.0, 0.0), io.getSecond());
-//
-//        String plant_category = n.denumerize(Arrays.asList(0.0, 1.0, 0.0));
-//        Assert.assertEquals("versicolor", plant_category);
-//    }
-//
-//    @Test
-//    public void testNumerizesAndDeNumerizesIrisDataSetExample3()
-//            throws Exception {
-//        DataSet ds = DataSetFactory.getIrisDataSet();
-//        Example first = ds.getExample(100);
-//        Numerizer n = new IrisDataSetNumerizer();
-//        Pair<List<Double>, List<Double>> io = n.numerize(first);
-//
-//        Assert.assertEquals(Arrays.asList(6.3, 3.3, 6.0, 2.5), io.getFirst());
-//        Assert.assertEquals(Arrays.asList(1.0, 0.0, 0.0), io.getSecond());
-//
-//        String plant_category = n.denumerize(Arrays.asList(1.0, 0.0, 0.0));
-//        Assert.assertEquals("virginica", plant_category);
-//    }
+    /**
+     * Demonstrate how to find sizes of examples
+     */
+    @Test
+    public void testSize() {
+        // set size
+        Assert.assertEquals(50, this.examples.size());
+        // example size
+        Assert.assertEquals(4, this.examples.getExample(0).getAttributes().length);
+    }
+
+    /**
+     * Demonstrate how to retrieve examples and attributes
+     */
+    @Test
+    public void testGet() {
+        // get attribute types
+        Attribute<String> a = this.examples.getExample(29).get("String"); // <Type> required to access generic object
+        Assert.assertEquals("...", a.getValue());
+        // get output
+        Example<Double> e = this.examples.getExample(19); // <Type> required to access generic object
+        Assert.assertNotNull(e.getOutput());
+    }
+
+    /**
+     * Demonstrate getPossibleAttributes() usage; the method should create an
+     * entry for every (name, value) combination.
+     */
+    @Test
+    public void testGetPossibleAttributes() {
+        // predicted count for each attribute
+        int strings = this.examples.getValuesOf("String").size(); // = 1
+        int number = this.examples.getValuesOf("Number").size(); // = 50
+        int bool = this.examples.getValuesOf("Boolean").size(); // = 2
+        int count = this.examples.getValuesOf("Count").size(); // = 50
+        // test
+        int expected = strings + number + bool + count;
+        int actual = this.examples.getPossibleAttributes().size();
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Demonstrate usage of getValuesOf(); we know that the "String" attribute
+     * should only have one distinct value, see setUp()
+     */
+    @Test
+    public void testGetValuesOf() {
+        int expected = 1;
+        int actual = this.examples.getValuesOf("String").size();
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Demonstrate usage of splitBy(); should split the set by attribute value.
+     * Tested by adding up the sizes of each value-set and comparing with the
+     * total
+     */
+    @Test
+    public void testSplitBy() {
+        int expected = this.examples.size();
+        // split
+        HashMap<Boolean, DataSet> attributeValues = this.examples.splitBy("Boolean");
+        // add up each split set
+        int actual = 0;
+        for (Boolean b : attributeValues.keySet()) {
+            actual += attributeValues.get(b).size();
+        }
+        // test
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Demonstrate find() usage
+     */
+    @Test
+    public void testFind() {
+        // look for "Boolean" false
+        int expected = 0;
+        for (Example e : this.examples) {
+            if (e.get("Boolean").getValue().equals(false)) {
+                expected++;
+            }
+        }
+        // test
+        int actual = this.examples.find("Boolean", false).size();
+        Assert.assertEquals(expected, actual);
+    }
+
+    /**
+     * Test whether entropy is calculated correctly
+     */
+    @Test
+    public void testEntropy() {
+        // test entropy of "String"
+        double expected = 0.0;
+        double actual = this.examples.getEntropyOf("String");
+        Assert.assertEquals(expected, actual, 0.0001);
+        // test entropy of "Boolean"
+        expected = 1.0; // should be close to 1.0 
+        actual = this.examples.getEntropyOf("Boolean");
+        Assert.assertEquals(expected, actual, 0.1);
+    }
+
+    @Test
+    public void testInformationGain() {
+        // @todo
+    }
+
+    /**
+     * Demonstate loading an example set from a URL; uses the trunk version of
+     * aima-data found at
+     * http://aima-data.googlecode.com/svn/trunk/restaurant.csv.
+     */
+    @Test
+    public void testLoadFromFile() {
+        // create restaurant sample; used example[0] from page 700, AIMAv3
+        Example<String> sample = new Example();
+        sample.add(new Attribute<String>("Alt", "Yes"));
+        sample.add(new Attribute<String>("Bar", "No"));
+        sample.add(new Attribute<String>("Fri", "No"));
+        sample.add(new Attribute<String>("Hun", "Yes"));
+        sample.add(new Attribute<String>("Pat", "Some"));
+        sample.add(new Attribute<String>("Price", "$$$"));
+        sample.add(new Attribute<String>("Rain", "No"));
+        sample.add(new Attribute<String>("Res", "Yes"));
+        sample.add(new Attribute<String>("Type", "French"));
+        sample.add(new Attribute<String>("Est", "0-10"));
+        sample.setOutput("Yes");
+        // load restaurant data
+        DataSet restaurants = new DataSet();
+        try {
+            URL url = new URL("http://aima-data.googlecode.com/svn/trunk/restaurant.csv");
+            restaurants = DataSet.loadFrom(url, ",", sample);
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+        // test
+        Assert.assertEquals("No", restaurants.getExample(1).getOutput());
+        Assert.assertEquals("Burger", restaurants.getExample(11).get("Type").getValue());
+    }
+
+    /**
+     * Test standard deviation and mean for the iris data set available with
+     * aima-data; see http://aima-data.googlecode.com/svn/trunk/iris.csv for
+     * more information; checks mean with data at
+     * http://aima-data.googlecode.com/svn/trunk/iris.txt
+     */
+    @Test
+    public void testDeviationAndMean() {
+        // create iris sample
+        Example<String> sample = new Example();
+        sample.add(new Attribute<Double>("sepal-length", 0.0));
+        sample.add(new Attribute<Double>("sepal-width", 0.0));
+        sample.add(new Attribute<Double>("petal-length", 0.0));
+        sample.add(new Attribute<Double>("petal-width", 0.0));
+        sample.setOutput("...");
+        // load restaurant data
+        DataSet iris = new DataSet();
+        try {
+            URL url = new URL("http://aima-data.googlecode.com/svn/trunk/iris.csv");
+            iris = DataSet.loadFrom(url, ",", sample);
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+        // prepare
+        ArrayList<Double> sepalLengths = new ArrayList<Double>();
+        for(Example e: iris){
+            Attribute<Double> a = e.get("sepal-length");
+            sepalLengths.add(a.getValue());
+        }
+        double sepalLengthMean = Util.calculateMean(sepalLengths);
+        double sepalLengthDeviation = Util.calculateStDev(sepalLengths, sepalLengthMean);
+        // test
+        Assert.assertEquals(5.84, sepalLengthMean, 0.01);
+        Assert.assertEquals(0.83, sepalLengthDeviation, 0.01);
+    }
 }
