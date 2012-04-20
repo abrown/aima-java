@@ -19,15 +19,15 @@ import java.util.List;
  * )
  * </pre>
  * @author Ciaran O'Reilly
- * @author
+ * @author Andrew Brown
  */
-public class Hypothesis extends QuantifiedSentence{
+public class FOLHypothesis extends QuantifiedSentence{
 
     /**
      * Constructor
      * @param classificationPredicate 
      */
-    public Hypothesis(String classificationPredicate) {
+    public FOLHypothesis(String classificationPredicate) {
         super("FORALL", buildVariables(), buildSentence(classificationPredicate));
     }
     
