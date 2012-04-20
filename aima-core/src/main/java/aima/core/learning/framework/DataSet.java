@@ -1,10 +1,14 @@
 package aima.core.learning.framework;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import aima.core.util.Util;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Provides methods for representing a set of learning examples
@@ -12,7 +16,7 @@ import java.util.HashSet;
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class DataSet implements Iterable<Example> {
+public class DataSet implements Iterable<Example>, Cloneable {
 
     public ArrayList<Example> examples;
 
@@ -66,14 +70,15 @@ public class DataSet implements Iterable<Example> {
         }
         return ds;
     }
-    
+
     /**
      * Find the examples that match the given attribute name/value pair
+     *
      * @param attributeName
      * @param attributeValue
-     * @return 
+     * @return
      */
-    public DataSet find(String attributeName, Object attributeValue){
+    public DataSet find(String attributeName, Object attributeValue) {
         DataSet ds = new DataSet();
         for (Example e : examples) {
             if (e.get(attributeName).getValue().equals(attributeValue)) {
@@ -106,10 +111,10 @@ public class DataSet implements Iterable<Example> {
      * @param attributeName
      * @return
      */
-    public HashMap<Object, DataSet> splitBy(String attributeName) {
-        HashMap<Object, DataSet> results = new HashMap<Object, DataSet>();
+    public <T> HashMap<T, DataSet> splitBy(String attributeName) {
+        HashMap<T, DataSet> results = new HashMap<T, DataSet>();
         for (Example e : this.examples) {
-            Object attributeValue = e.get(attributeName).getValue();
+            T attributeValue = (T) e.get(attributeName).getValue();
             if (results.containsKey(attributeValue)) {
                 results.get(attributeValue).add(e);
             } else {
@@ -120,16 +125,17 @@ public class DataSet implements Iterable<Example> {
         }
         return results;
     }
-    
+
     /**
-     * Return each value for this attribute in the example set
+     * Return each distinct value for this attribute in the example set
+     *
      * @param attributeName
-     * @return 
+     * @return
      */
-    public HashSet<Object> getValuesOf(String attributeName){
-        HashSet<Object> values = new HashSet<Object>();
-        for(Example e : this.examples){
-            values.add(e.get(attributeName).getValue());
+    public <T> HashSet<T> getValuesOf(String attributeName) {
+        HashSet<T> values = new HashSet<T>();
+        for (Example e : this.examples) {
+            values.add((T) e.get(attributeName).getValue());
         }
         return values;
     }
@@ -169,11 +175,12 @@ public class DataSet implements Iterable<Example> {
     }
 
     /**
-     * Calculate information gain--the expected reduction in entropy--after 
+     * Calculate information gain--the expected reduction in entropy--after
      * testing the given attribute; see page 704, AIMAv3. Used in
      * DecisionTreeLearner.
+     *
      * @param attributeName
-     * @return 
+     * @return
      */
     public double getInformationGainOf(String attributeName) {
         HashMap<Object, DataSet> attributeValueMap = this.splitBy(attributeName);
@@ -184,7 +191,64 @@ public class DataSet implements Iterable<Example> {
             double matchingValueSize = attributeValueMap.get(attributeValue).size();
             remainder += (matchingValueSize / totalSize) * attributeValueMap.get(attributeValue).getEntropyOf(attributeName);
         }
-        return this.getEntropyOf(attributeName) - remainder;
+        //return this.getEntropyOf(attributeName) - remainder;
+        return 1 - remainder;
+    }
+
+    /**
+     * Returns a set of examples from a given CSV file and a sample Example; CSV
+     * file should be located in the "aima/core/learning/data" directory.
+     *
+     * @param filename
+     * @param sample
+     * @param separator
+     * @return
+     * @throws Exception
+     */
+    public static DataSet loadFrom(URL url, String separator, Example sample) throws IOException {
+        DataSet ds = new DataSet();
+        InputStreamReader stream = new InputStreamReader(url.openStream());
+        BufferedReader reader = new BufferedReader(stream);
+        String line;
+        // loop through lines
+        while ((line = reader.readLine()) != null) {
+            ds.add(DataSet.loadLine(line, separator, sample));
+        }
+        // return
+        return ds;
+    }
+
+    /**
+     * Returns an Example from a CSV line
+     *
+     * @param line
+     * @param separator
+     * @param sample
+     * @return
+     */
+    private static <T> Example<T> loadLine(String line, String separator, Example<T> sample) {
+        // set attributes
+        String[] parts = line.split(separator);
+        Example<T> new_example = sample.clone();
+        for (int i = 0; i < sample.inputAttributes.size(); i++) {
+            if (i < parts.length) {
+                Attribute<?> old_attribute = (Attribute) sample.inputAttributes.get(i);
+                Attribute<?> new_attribute = old_attribute.clone();
+                new_attribute.setValue(parts[i].trim());
+                new_example.inputAttributes.remove(old_attribute);
+                new_example.add(new_attribute);
+            }
+        }
+        // set output value; uses reflection to match the generic outputValue type
+        try {
+            String last_field = parts[parts.length - 1].trim();
+            T value = (T) sample.outputValue.getClass().getDeclaredConstructor(String.class).newInstance(last_field);
+            new_example.setOutput(value);
+        } catch (Exception e) {
+            new_example.outputValue = null;
+        }
+        // return
+        return new_example;
     }
 
     /**
@@ -226,15 +290,16 @@ public class DataSet implements Iterable<Example> {
     }
 
     /**
-     * Copies this set to a new object
+     * Clone
      *
      * @return
      */
-    public DataSet copy() {
-        DataSet ds = new DataSet();
-        for (Example e : examples) {
-            ds.add(e);
+    @Override
+    public DataSet clone() {
+        DataSet copy = new DataSet();
+        for (Example e : this) {
+            copy.add(e.clone());
         }
-        return ds;
+        return copy;
     }
 }

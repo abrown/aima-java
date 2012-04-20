@@ -1,17 +1,17 @@
 package aima.core.learning.framework;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
- * Represents a learning example; according to page 699, in a Boolean decision 
- * tree it is the pair (x, y), where "x is a vector of values for the input 
+ * Represents a learning example; according to page 699, in a Boolean decision
+ * tree it is the pair (x, y), where "x is a vector of values for the input
  * attributes and y is a single boolean output value". This definition has been
  * abstracted to produce this generic class.
+ *
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class Example<E> {
+public class Example<E> implements Cloneable {
 
     /**
      * The input attributes for this example
@@ -30,6 +30,7 @@ public class Example<E> {
 
     /**
      * Constructor
+     *
      * @param inputAttributes
      * @param outputValue
      */
@@ -40,7 +41,8 @@ public class Example<E> {
 
     /**
      * Adds an attribute to this example
-     * @param attribute 
+     *
+     * @param attribute
      */
     public void add(Attribute attribute) {
         this.inputAttributes.add(attribute);
@@ -48,8 +50,9 @@ public class Example<E> {
 
     /**
      * Returns the specified attribute by name
+     *
      * @param attributeName
-     * @return 
+     * @return
      */
     public Attribute get(String attributeName) {
         for (Attribute a : inputAttributes) {
@@ -61,16 +64,27 @@ public class Example<E> {
     }
 
     /**
+     * Set the output value
+     *
+     * @param outputValue
+     */
+    public void setOutput(E outputValue) {
+        this.outputValue = outputValue;
+    }
+
+    /**
      * Returns the output value
-     * @return 
+     *
+     * @return
      */
     public E getOutput() {
-        return this.outputValue;
+        return (E) this.outputValue;
     }
 
     /**
      * Returns the list of attributes
-     * @return 
+     *
+     * @return
      */
     public Attribute[] getAttributes() {
         return this.inputAttributes.toArray(new Attribute[0]);
@@ -78,7 +92,8 @@ public class Example<E> {
 
     /**
      * Returns string representation
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -90,28 +105,54 @@ public class Example<E> {
     }
 
     /**
-     * Overrides equality test
-     * @param o
-     * @return 
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if ((o == null) || (this.getClass() != o.getClass())) {
-            return false;
-        }
-        Example other = (Example) o;
-        return inputAttributes.equals(other.inputAttributes);
-    }
-
-    /**
-     * For use with equals()
-     * @return 
+     * Auto-generate hash code
+     *
+     * @return
      */
     @Override
     public int hashCode() {
-        return inputAttributes.hashCode();
+        int hash = 5;
+        hash = 41 * hash + (this.inputAttributes != null ? this.inputAttributes.hashCode() : 0);
+        hash = 41 * hash + (this.outputValue != null ? this.outputValue.hashCode() : 0);
+        return hash;
+    }
+
+    /**
+     * Auto-generate equals()
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Example<E> other = (Example<E>) obj;
+        if (this.inputAttributes != other.inputAttributes && (this.inputAttributes == null || !this.inputAttributes.equals(other.inputAttributes))) {
+            return false;
+        }
+        if (this.outputValue != other.outputValue && (this.outputValue == null || !this.outputValue.equals(other.outputValue))) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Clone
+     *
+     * @return
+     */
+    @Override
+    public Example<E> clone() {
+        Example<E> copy = new Example();
+        for (Attribute a : this.getAttributes()) {
+            copy.add(a.clone());
+        }
+        copy.setOutput(this.outputValue);
+        return copy;
     }
 }

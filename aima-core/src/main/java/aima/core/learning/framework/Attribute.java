@@ -3,18 +3,20 @@ package aima.core.learning.framework;
 /**
  * Defines an attribute of an example; attributes are the key-value pairs that
  * make up an Example. See pages 699 and 700 of AIMAv3.
+ *
  * @author Ravi Mohan
  * @author Andrew Brown
  */
-public class Attribute<E> {
+public class Attribute<E> implements Cloneable {
 
     String name;
     E value;
 
     /**
      * Constructor
+     *
      * @param name
-     * @param value 
+     * @param value
      */
     public Attribute(String name, E value) {
         this.name = name;
@@ -23,7 +25,8 @@ public class Attribute<E> {
 
     /**
      * Constructor
-     * @param value 
+     *
+     * @param value
      */
     public Attribute(E value) {
         this.name = "Unnamed Attribute";
@@ -32,7 +35,8 @@ public class Attribute<E> {
 
     /**
      * Sets the attribute name
-     * @param name 
+     *
+     * @param name
      */
     public void setName(String name) {
         this.name = name;
@@ -40,7 +44,8 @@ public class Attribute<E> {
 
     /**
      * Returns the attribute name
-     * @return 
+     *
+     * @return
      */
     public String getName() {
         return this.name;
@@ -48,7 +53,8 @@ public class Attribute<E> {
 
     /**
      * Sets the attribute value
-     * @param value 
+     *
+     * @param value
      */
     public void setValue(E value) {
         this.value = value;
@@ -57,7 +63,8 @@ public class Attribute<E> {
     /**
      * Sets the attribute value auto-magically from a String to the generic
      * type.
-     * @param value 
+     *
+     * @param value
      */
     public void setValue(String value) {
         try {
@@ -70,17 +77,19 @@ public class Attribute<E> {
 
     /**
      * Returns the attribute value
-     * @return 
+     *
+     * @return
      */
     public E getValue() {
-        return this.value;
+        return (E) this.value;
     }
 
     /**
      * Determines whether the attribute value is a valid one; override this
      * method in descendants
+     *
      * @param value
-     * @return 
+     * @return
      */
     public boolean isValid(E value) {
         if (value != null) {
@@ -92,24 +101,59 @@ public class Attribute<E> {
 
     /**
      * Returns a string representation of the value of this attribute
-     * @return 
+     *
+     * @return
      */
+    @Override
     public String toString() {
         return this.value.toString();
     }
 
     /**
-     * Checks if this attribute is equivalent to another
-     * @param a
-     * @return 
+     * Auto-generate hash code
+     *
+     * @return
      */
-    public boolean equals(Attribute a) {
-        if (!this.getName().equals(a.getName())) {
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 71 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 71 * hash + (this.value != null ? this.value.hashCode() : 0);
+        return hash;
+    }
+
+    /**
+     * Auto-generate equals()
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
             return false;
         }
-        if (!this.getValue().equals(a.getValue())) {
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Attribute<E> other = (Attribute<E>) obj;
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        if (this.value != other.value && (this.value == null || !this.value.equals(other.value))) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Clone
+     *
+     * @return
+     */
+    @Override
+    public Attribute<E> clone() {
+        Attribute<E> copy = new Attribute(this.getName(), this.getValue());
+        return copy;
     }
 }
