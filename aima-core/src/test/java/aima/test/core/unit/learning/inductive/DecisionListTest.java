@@ -35,9 +35,9 @@ public class DecisionListTest {
     @Test
     public void testPredict() {
         // get restaurant data
-        DataSet restaurant = null;
+        DataSet restaurantData = null;
         try{
-            DataSetTest.loadRestaurantData();
+            restaurantData = DataSetTest.loadRestaurantData();
         }
         catch(IOException e){
             Assert.fail("Could not load restaurant data from URL.");
@@ -51,9 +51,9 @@ public class DecisionListTest {
         DecisionList dl = new DecisionList();
         dl.add(t);
         // test fall-through
-        Assert.assertEquals(null, dl.predict(restaurant.getExample(0)));
+        Assert.assertEquals(null, dl.predict(restaurantData.getExample(0)));
         // test matching
-        Assert.assertEquals("No", dl.predict(restaurant.getExample(4)));
+        Assert.assertEquals("No", dl.predict(restaurantData.getExample(4)));
     }
     
     /**

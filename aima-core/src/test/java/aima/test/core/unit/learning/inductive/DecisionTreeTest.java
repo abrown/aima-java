@@ -28,9 +28,9 @@ public class DecisionTreeTest {
     @Test
     public void testPredict() {
         // get restaurant data
-        DataSet restaurant = null;
+        DataSet restaurantData = null;
         try {
-            DataSetTest.loadRestaurantData();
+            restaurantData = DataSetTest.loadRestaurantData();
         } catch (IOException e) {
             Assert.fail("Could not load restaurant data from URL.");
         }
@@ -40,11 +40,11 @@ public class DecisionTreeTest {
         t.addLeaf("$$", "Yes"); // alternate form, preferred
         t.addLeaf("$$$", "Maybe");
         // test
-        Assert.assertEquals("No", t.predict(restaurant.getExample(1)));
-        Assert.assertEquals("Yes", t.predict(restaurant.getExample(5)));
-        Assert.assertEquals("Maybe", t.predict(restaurant.getExample(0)));
+        Assert.assertEquals("No", t.predict(restaurantData .getExample(1)));
+        Assert.assertEquals("Yes", t.predict(restaurantData .getExample(5)));
+        Assert.assertEquals("Maybe", t.predict(restaurantData .getExample(0)));
         // test tree coverage
-        for (Example e : restaurant) {
+        for (Example e : restaurantData ) {
             Assert.assertNotNull(t.predict(e));
         }
     }
