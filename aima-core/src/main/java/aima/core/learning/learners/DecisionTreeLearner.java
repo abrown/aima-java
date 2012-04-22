@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class DecisionTreeLearner implements Learner {
 
-    private DecisionTree trainedTree;
+    protected DecisionTree trainedTree;
 
     /**
      * Constructor
@@ -114,7 +114,7 @@ public class DecisionTreeLearner implements Learner {
      * @param attributeNames
      * @return
      */
-    private String getMostImportantAttribute(List<String> attributeNames, DataSet examples) {
+    public String getMostImportantAttribute(List<String> attributeNames, DataSet examples) {
         double greatestGain = 0.0;
         String attributeWithGreatestGain = attributeNames.get(0);
         for (String attributeName : attributeNames) {
@@ -188,7 +188,6 @@ public class DecisionTreeLearner implements Learner {
     @Override
     public int[] test(DataSet examples) {
         int[] results = new int[]{0, 0};
-
         for (Example e : examples) {
             if (e.getOutput().equals(this.trainedTree.predict(e))) {
                 results[0]++;
