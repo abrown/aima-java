@@ -55,6 +55,10 @@ public class DataResource {
     public static int put(String filename, InputStream stream) {
         try {
             File f = DataResource.getFileFrom(filename);
+            if( !f.exists() ){
+                f.getParentFile().mkdirs();
+                f.createNewFile();
+            }
             BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
             BufferedWriter writer = new BufferedWriter(new FileWriter(f));
             String line;
@@ -64,6 +68,8 @@ public class DataResource {
                 writer.newLine();
                 lineCount++;
             }
+            reader.close();
+            writer.close();
             return lineCount;
         } catch (IOException e) {
             throw new RuntimeException(e);
