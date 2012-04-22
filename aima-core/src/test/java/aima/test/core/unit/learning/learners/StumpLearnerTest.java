@@ -14,26 +14,39 @@ import org.junit.Test;
  */
 public class StumpLearnerTest {
 
+    DataSet restaurantData;
+    StumpLearner[] learners;
+
     /**
-     * 
+     * Constructor
      */
-    @Test
-    public void trainAndTest() {
+    public StumpLearnerTest() {
         // get restaurant data
-        DataSet restaurantData = null;
+        this.restaurantData = null;
         try {
-            restaurantData = DataSetTest.loadRestaurantData();
+            this.restaurantData = DataSetTest.loadRestaurantData();
         } catch (IOException e) {
             Assert.fail("Could not load restaurant data from URL.");
         }
-        // setup decision list learner
-        StumpLearner learner = new StumpLearner();
-        // train
-        learner.train(restaurantData);
+        // create stumps
+        this.learners = new StumpLearner[5];
+        for (int i = 0; i < 5; i++) {
+            this.learners[i] = new StumpLearner();
+            this.learners[i].train(this.restaurantData);
+        }
+    }
+
+    /**
+     * Ensure stumps are at least weak learning; i.e. their prediction accuracy
+     * is better than guessing
+     */
+    @Test
+    public void testStumpsForAccuracy() {
         // test
-        int[] results = learner.test(restaurantData);
-        double proportionCorrect = results[0] / restaurantData.size();
-        System.out.println(proportionCorrect);
-        Assert.assertTrue(proportionCorrect > 0.95);
+        for (int i = 0; i < 5; i++) {
+            int[] results = this.learners[i].test(restaurantData);
+            double proportionCorrect = (double) results[0] / restaurantData.size();
+            Assert.assertTrue(proportionCorrect > 0.5);
+        }
     }
 }
