@@ -14,26 +14,44 @@ import org.junit.Test;
  */
 public class DecisionListLearnerTest {
 
+    DataSet restaurantData;
+    DecisionListLearner learner;
+
     /**
-     * Trains a decision list with the restaurant data and tests its
-     * effectiveness
+     * Constructor
      */
-    @Test
-    public void trainAndTest() {
+    public DecisionListLearnerTest() {
         // get restaurant data
-        DataSet restaurantData = null;
+        this.restaurantData = null;
         try {
-            restaurantData = DataSetTest.loadRestaurantData();
+            this.restaurantData = DataSetTest.loadRestaurantData();
         } catch (IOException e) {
             Assert.fail("Could not load restaurant data from URL.");
         }
         // setup decision list learner
-        DecisionListLearner learner = new DecisionListLearner();
+        this.learner = new DecisionListLearner();
         // train
-        learner.train(restaurantData);
+        this.learner.train(this.restaurantData);
+    }
+
+    /**
+     * Test a decision list with the restaurant data
+     */
+    @Test
+    public void testTrainedDecisionList() {
         // test
-        int[] results = learner.test(restaurantData);
-        double proportionCorrect = results[0] / restaurantData.size();
+        int[] results = this.learner.test(this.restaurantData);
+        double proportionCorrect = (double) results[0] / this.restaurantData.size();
         Assert.assertTrue(proportionCorrect > 0.95);
+    }
+
+    /**
+     * Demonstrate toString() format
+     */
+    @Test
+    public void showToString() {
+        System.out.println("DecisionList: ");
+        System.out.println(this.learner.getDecisionList());
+        System.out.println();
     }
 }
