@@ -76,6 +76,7 @@ public class AdaBoostLearner implements Learner {
         double[] z = new double[K];
         // for each K
         for (int k = 1; k <= K; k++) {
+            h[k].train(examples); // @todo h[k] <- L(examples, w); w not really implemented here; each Learner will be identical
             double error = 0;
             for (int j = 1; j <= N; j++) {
                 Object x_j = h[k].predict(examples.getExample(j));
