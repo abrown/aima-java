@@ -1,8 +1,10 @@
 package aima.core.learning.framework;
 
+import aima.core.learning.data.DataResource;
 import aima.core.util.Util;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -207,17 +209,31 @@ public class DataSet implements Iterable<Example>, Cloneable {
      */
     public static DataSet loadFrom(URL url, String separator, Example sample) throws IOException {
         DataSet ds = new DataSet();
-        InputStreamReader stream = new InputStreamReader(url.openStream());
-        BufferedReader reader = new BufferedReader(stream);
+        // check cache
+        InputStream stream;
+        if( DataResource.isCached(url.getFile()) ){
+            stream = DataResource.get(url.getFile());
+        }
+        else{
+            stream = url.openStream();
+        }
+        // loop through stream lines
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         String line;
-        // loop through lines
         while ((line = reader.readLine()) != null) {
             ds.add(DataSet.loadLine(line, separator, sample));
+        }
+        // save to cache if necessary
+        if( !DataResource.isCached(url.getFile()) ){
+            stream.reset();
+            DataResource.put(url.getFile(), stream);
         }
         // return
         return ds;
     }
 
+    
+    
     /**
      * Returns an Example from a CSV line
      *
@@ -302,15 +318,16 @@ public class DataSet implements Iterable<Example>, Cloneable {
         }
         return copy;
     }
-    
+
     /**
      * Return string representation
+     *
      * @return
      */
     @Override
-    public String toString(){
+    public String toString() {
         StringBuilder s = new StringBuilder("DataSet:[\n");
-        for(Example e : this.examples){
+        for (Example e : this.examples) {
             s.append(" ");
             s.append(e);
             s.append(",\n");
