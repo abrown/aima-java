@@ -60,6 +60,7 @@ public class NeuralNetworkTest {
         assertEquals(this.n.layers.size(), actual.layers.size());
         assertEquals(this.n.layers.get(0).perceptrons.get(0).weights,
                 actual.layers.get(0).perceptrons.get(0).weights);
+        file.delete();
     }
 
     /**
