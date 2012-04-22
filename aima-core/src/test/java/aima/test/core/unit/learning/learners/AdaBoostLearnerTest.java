@@ -1,9 +1,6 @@
 package aima.test.core.unit.learning.learners;
 
-import aima.core.learning.framework.Attribute;
 import aima.core.learning.framework.DataSet;
-import aima.core.learning.framework.Example;
-import aima.core.learning.inductive.DecisionList;
 import aima.core.learning.learners.AdaBoostLearner;
 import aima.core.learning.learners.StumpLearner;
 import aima.test.core.unit.learning.framework.DataSetTest;
@@ -13,13 +10,14 @@ import org.junit.Test;
 
 /**
  * AdaBoostLearnerTest
+ *
  * @author Andrew Brown
  */
 public class AdaBoostLearnerTest {
 
     /**
      * Test ADABOOST with parameters described on page 750, AIMAv3; uses five
-     * decision stumps (StumpLearner) to train on the twelve restaurant 
+     * decision stumps (StumpLearner) to train on the twelve restaurant
      * examples.
      */
     @Test
@@ -38,8 +36,8 @@ public class AdaBoostLearnerTest {
         learner.train(restaurantData);
         // test
         int[] results = learner.test(restaurantData);
-        double proportionCorrect = results[0] / restaurantData.size();
-        System.out.println(proportionCorrect);
+        double proportionCorrect = (double) results[0] / restaurantData.size();
+        System.out.println("ADABOOST Accuracy: " + proportionCorrect);
         Assert.assertTrue(proportionCorrect > 0.95);
     }
 }
