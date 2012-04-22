@@ -302,4 +302,20 @@ public class DataSet implements Iterable<Example>, Cloneable {
         }
         return copy;
     }
+    
+    /**
+     * Return string representation
+     * @return
+     */
+    @Override
+    public String toString(){
+        StringBuilder s = new StringBuilder("DataSet:[\n");
+        for(Example e : this.examples){
+            s.append(" ");
+            s.append(e);
+            s.append(",\n");
+        }
+        s.append("]");
+        return s.toString();
+    }
 }
