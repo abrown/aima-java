@@ -120,22 +120,23 @@ public class DecisionTree<E> {
      */
     public String toString(int depth, StringBuilder s) {
         if (this.getAttribute().getName() != null) {
-            s.append(Util.ntimes("  ", depth));
-            s.append("|- ");
+            s.append("[");
             s.append(this.getAttribute().getName());
+            s.append("]");
             s.append("\n");
             for (E attributeValue : this.branches.keySet()) {
                 s.append(Util.ntimes("  ", depth + 1));
                 s.append("|- ");
                 s.append(attributeValue);
+                s.append(" -> ");
                 DecisionTree child = this.branches.get(attributeValue);
                 if( child instanceof DecisionTreeLeaf){
-                    s.append(" -> ");
                     s.append(child);
                     s.append("\n");
                 }
                 else{
                     s.append("\n");
+                    s.append(Util.ntimes("  ", depth + 1));
                     s.append(child.toString(depth + 1, new StringBuilder()));
                 }
             }
