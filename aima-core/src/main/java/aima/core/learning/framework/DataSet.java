@@ -177,6 +177,38 @@ public class DataSet implements Iterable<Example>, Cloneable {
     }
 
     /**
+     * Calculate entropy of output values in the example set; see 
+     * getEntropyOf() for details.
+     *
+     * @return
+     */
+    public double getEntropyOfOutput(){
+        HashMap<Object, Integer> distribution = new HashMap<Object, Integer>();
+        // count number of values v_k for variable V, page 704
+        for (Example e : examples) {
+            Object value = e.getOutput();
+            if (distribution.containsKey(value)) {
+                distribution.put(value, distribution.get(value) + 1);
+            } else {
+                distribution.put(value, 1);
+            }
+        }
+        // normalize probability distribution, see page 493
+        double[] normalizedDistribution = new double[distribution.keySet().size()];
+        Iterator<Integer> iter = distribution.values().iterator();
+        for (int i = 0; i < normalizedDistribution.length; i++) {
+            normalizedDistribution[i] = iter.next();
+        }
+        normalizedDistribution = Util.normalize(normalizedDistribution);
+        // calculate entropy H(V), page 704		
+        double total = 0.0;
+        for (double d : normalizedDistribution) {
+            total += d * Util.log2(d);
+        }
+        return -1.0 * total;
+    }
+
+    /**
      * Calculate information gain--the expected reduction in entropy--after
      * testing the given attribute; see page 704, AIMAv3. Used in
      * DecisionTreeLearner.
@@ -189,12 +221,12 @@ public class DataSet implements Iterable<Example>, Cloneable {
         double totalSize = this.examples.size();
         double remainder = 0.0;
         for (Object attributeValue : attributeValueMap.keySet()) {
-            // @todo "matchingValueSize" does not conform exactly to "p_k + p_n" described on page 704
+            // this may not look exactly like page 704, but is equivalent:
             double matchingValueSize = attributeValueMap.get(attributeValue).size();
-            remainder += (matchingValueSize / totalSize) * attributeValueMap.get(attributeValue).getEntropyOf(attributeName);
+            double outputEntropy = attributeValueMap.get(attributeValue).getEntropyOfOutput();
+            remainder += (matchingValueSize / totalSize) * outputEntropy;
         }
-        //return this.getEntropyOf(attributeName) - remainder;
-        return 1 - remainder;
+        return this.getEntropyOfOutput() - remainder;
     }
 
     /**
@@ -223,10 +255,10 @@ public class DataSet implements Iterable<Example>, Cloneable {
         while ((line = reader.readLine()) != null) {
             ds.add(DataSet.loadLine(line, separator, sample));
         }
+        reader.close();
         // save to cache if necessary
         if( !DataResource.isCached(url.getFile()) ){
-            stream.reset();
-            DataResource.put(url.getFile(), stream);
+            DataResource.put(url.getFile(), url.openStream());
         }
         // return
         return ds;
