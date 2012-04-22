@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class MajorityLearner<E> implements Learner {
 
-    private E result;
+    public E result;
 
     /**
      * Train this learner to return the most common example output.

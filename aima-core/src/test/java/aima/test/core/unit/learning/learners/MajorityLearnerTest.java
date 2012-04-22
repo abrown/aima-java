@@ -14,27 +14,35 @@ import org.junit.Test;
  */
 public class MajorityLearnerTest {
 
+    DataSet restaurantData;
+    MajorityLearner learner;
+
     /**
-     * Trains a decision list with the restaurant data and tests its
-     * effectiveness
+     * Constructor
      */
-    @Test
-    public void trainAndTest() {
+    public MajorityLearnerTest() {
         // get restaurant data
-        DataSet restaurantData = null;
+        this.restaurantData = null;
         try {
-            restaurantData = DataSetTest.loadRestaurantData();
+            this.restaurantData = DataSetTest.loadRestaurantData();
         } catch (IOException e) {
             Assert.fail("Could not load restaurant data from URL.");
         }
         // setup decision list learner
-        MajorityLearner learner = new MajorityLearner();
+        this.learner = new MajorityLearner();
         // train
-        learner.train(restaurantData);
+        this.learner.train(this.restaurantData);
+    }
+
+    /**
+     * Test a majority learner with the restaurant data
+     */
+    @Test
+    public void testTrainedMajorityLearner() {
         // test
-        int[] results = learner.test(restaurantData);
-        double proportionCorrect = results[0] / restaurantData.size();
-        System.out.println(proportionCorrect);
-        Assert.assertTrue(proportionCorrect > 0.95);
+        int[] results = this.learner.test(this.restaurantData);
+        double proportionCorrect = (double) results[0] / this.restaurantData.size();
+        // restaurant set has exactly half "Yes" and half "No", page 700
+        Assert.assertEquals(0.5, proportionCorrect, 0.001);
     }
 }
