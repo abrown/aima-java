@@ -34,7 +34,6 @@ public class DecisionListLearnerTest {
         // test
         int[] results = learner.test(restaurantData);
         double proportionCorrect = results[0] / restaurantData.size();
-        System.out.println(proportionCorrect);
         Assert.assertTrue(proportionCorrect > 0.95);
     }
 }
