@@ -42,7 +42,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree<E> {
      * @param tree 
      */
     @Override
-    public void addNode(E value, DecisionTree node) {
+    public void addBranch(E value, DecisionTree node) {
         throw new RuntimeException("Cannot add a node to DecisionTreeLeaf.");
     }
 
@@ -52,7 +52,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree<E> {
      * @return 
      */
     @Override
-    public Object predict(Example e) {
+    public E predict(Example e) {
         return value;
     }
 
@@ -62,7 +62,7 @@ public class DecisionTreeLeaf<E> extends DecisionTree<E> {
      */
     @Override
     public String toString() {
-        return "DECISION -> " + value;
+        return value.toString();
     }
 
     /**
@@ -73,8 +73,10 @@ public class DecisionTreeLeaf<E> extends DecisionTree<E> {
      */
     @Override
     public String toString(int depth, StringBuilder buf) {
-        buf.append(Util.ntimes("\t", depth + 1));
-        buf.append("DECISION -> " + value + "\n");
+        buf.append(Util.ntimes("  ", depth + 1));
+        buf.append("DECISION -> ");
+        buf.append(value);
+        buf.append("\n");
         return buf.toString();
     }
 }

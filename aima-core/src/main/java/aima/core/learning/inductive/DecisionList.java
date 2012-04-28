@@ -1,75 +1,74 @@
 package aima.core.learning.inductive;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import aima.core.learning.framework.Example;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Implements the decision list object used by DECISION-LIST-LEARNING on 
- * page 717, AIMAv3.
+ * Implements the decision list object used by DECISION-LIST-LEARNING on page
+ * 717, AIMAv3. For DECISION-LIST-LEARNING, see DecisionListLearner.
+ *
  * @author Ravi Mohan
  * @author Andrew Brown
  */
 public class DecisionList {
 
     /**
-     * Possible outcomes
-     */
-    public static final boolean SUCCESS = true;
-    public static final boolean FAILURE = false;
-    
-    /**
      * "A decision list consists of a series of tests", page 715, AIMAv3
      */
     private List<DecisionListTest> tests;
-    
-    /**
-     * Outcomes
-     */
-    private HashMap<DecisionListTest, Boolean> outcomes;
 
     /**
      * Constructor
      */
     public DecisionList() {
         this.tests = new ArrayList<DecisionListTest>();
-        this.outcomes = new HashMap<DecisionListTest, Boolean>();
     }
 
     /**
      * Make prediction based on the decision list tests
+     *
      * @param example
      * @return true on match; false otherwise
      */
-    public boolean predict(Example example) {
+    public <T> T predict(Example example) {
         // test size
         if (this.tests.isEmpty()) {
-            return DecisionList.FAILURE;
+            return null;
         }
         // test each outcome
         for (DecisionListTest test : this.tests) {
             if (test.matches(example)) {
-                return DecisionList.SUCCESS;
+                return (T) test.getOutput();
             }
         }
         // default
-        return DecisionList.FAILURE;
+        return null;
     }
 
     /**
      * Add a test to the decision list
+     *
      * @param test
-     * @param outcome 
+     * @param outcome
      */
     public void add(DecisionListTest test) {
-        tests.add(test);
+        this.tests.add(test);
+    }
+    
+    /**
+     * Return number of tests in this decision list
+     * @return 
+     */
+    public int size(){
+        return this.tests.size();
     }
 
     /**
      * Merge this decision list with another
+     *
      * @param list
-     * @return 
+     * @return
      */
     public DecisionList mergeWith(DecisionList list) {
         DecisionList merged = new DecisionList();
@@ -87,7 +86,8 @@ public class DecisionList {
 
     /**
      * Return string representation
-     * @return 
+     *
+     * @return
      */
     @Override
     public String toString() {
@@ -95,9 +95,11 @@ public class DecisionList {
         s.append("IF ");
         for (DecisionListTest test : this.tests) {
             s.append(test);
-            s.append(" THEN true ELSE ");
+            s.append(" THEN ");
+            s.append(test.getOutput());
+            s.append(" ELSE ");
         }
-        s.append("false");
+        s.append("null");
         return s.toString();
     }
 }

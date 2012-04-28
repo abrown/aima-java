@@ -1,82 +1,54 @@
 package aima.core.learning.learners;
 
-import java.util.Iterator;
-import java.util.List;
+import aima.core.learning.framework.Attribute;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
-import aima.core.learning.inductive.DecisionTreeLeaf;
 import aima.core.learning.inductive.DecisionTree;
-import aima.core.util.Util;
+import aima.core.learning.inductive.DecisionTreeLeaf;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
+ * Uses DECISION-TREE-LEARNING from page 702, AIMAv3, to induce decision trees
+ * (see DecisionTree).
+ *
  * @author Ravi Mohan
  * @author Mike Stampone
+ * @author Andrew Brown
  */
 public class DecisionTreeLearner implements Learner {
 
-    private DecisionTree tree;
-    private String defaultValue;
+    protected DecisionTree trainedTree;
 
-    public DecisionTreeLearner() {
-        this.defaultValue = "Unable To Classify";
-
-    }
-
-    // used when you have to test a non induced tree (eg: for testing)
-    public DecisionTreeLearner(DecisionTree tree, String defaultValue) {
-        this.tree = tree;
-        this.defaultValue = defaultValue;
-    }
-
-    //
-    // START-Learner
     /**
-     * Induces the decision tree from the specified set of examples
-     * 
-     * @param ds
-     *            a set of examples for constructing the decision tree
+     * Constructor
      */
-    @Override
-    public void train(DataSet ds) {
-        List<String> attributes = ds.getNonTargetAttributes();
-        this.tree = decisionTreeLearning(ds, attributes,
-                new DecisionTreeLeaf(defaultValue));
+    public DecisionTreeLearner() {
     }
 
-    @Override
-    public String predict(Example e) {
-        return (String) tree.predict(e);
-    }
-
-    @Override
-    public int[] test(DataSet ds) {
-        int[] results = new int[]{0, 0};
-
-        for (Example e : ds.examples) {
-            if (e.targetValue().equals(tree.predict(e))) {
-                results[0] = results[0] + 1;
-            } else {
-                results[1] = results[1] + 1;
-            }
-        }
-        return results;
-    }
-
-    // END-Learner
-    //
     /**
-     * Returns the decision tree of this decision tree learner
-     * 
-     * @return the decision tree of this decision tree learner
+     * Constructor: used when testing a non-induced tree (i.e. for testing)
+     *
+     * @param tree
+     */
+    public DecisionTreeLearner(DecisionTree tree) {
+        this.trainedTree = tree;
+    }
+
+    /**
+     * Return the decision tree
+     *
+     * @return
      */
     public DecisionTree getDecisionTree() {
-        return tree;
+        return trainedTree;
     }
 
     /**
      * Implements DECISION-TREE-LEARNING function from page 702 of AIMAv3:
-     * 
+     *
      * <pre><code>
      * function DECISION-TREE-LEARNING(examples, attributes, parent_examples) returns a tree
      *  if examples is empty then return PLURALITY-VALUE(parent_examples)
@@ -91,70 +63,138 @@ public class DecisionTreeLearner implements Learner {
      *          add a branch to tree with label (A = v_k) and subtree subtree
      *      return tree
      * </code></pre>
+     *
      * @param ds
      * @param attributeNames
      * @param defaultTree
-     * @return 
+     * @return
      */
-    private DecisionTree decisionTreeLearning(DataSet ds,
-            List<String> attributeNames, DecisionTreeLeaf defaultTree) {
-        if (ds.size() == 0) {
-            return defaultTree;
+    private DecisionTree decisionTreeLearning(DataSet examples, List<String> attributeNames, DataSet parent_examples) {
+        if (examples.size() == 0) {
+            return new DecisionTreeLeaf(this.getPluralityValue(parent_examples));
         }
-        if (allExamplesHaveSameClassification(ds)) {
-            return new DecisionTreeLeaf(ds.getExample(0).targetValue());
+        if (this.allExamplesHaveSameClassification(examples)) {
+            return new DecisionTreeLeaf(examples.getExample(0).getOutput());
         }
-        if (attributeNames.size() == 0) {
-            return majorityValue(ds);
+        if (attributeNames.isEmpty()) {
+            return new DecisionTreeLeaf(this.getPluralityValue(examples));
         }
-        String chosenAttribute = chooseAttribute(ds, attributeNames);
-
-        DecisionTree tree = new DecisionTree(null);
-        DecisionTreeLeaf m = majorityValue(ds);
-
-        List<String> values = ds.getPossibleAttributeValues(chosenAttribute);
-        for (String v : values) {
-            DataSet filtered = ds.matchingDataSet(chosenAttribute, v);
-            List<String> newAttribs = Util.removeFrom(attributeNames,
-                    chosenAttribute);
-            DecisionTree subTree = decisionTreeLearning(filtered, newAttribs, m);
-            tree.addNode(v, subTree);
-
+        // A <- argmax_(a in attributes) IMPORTANCE(a, examples)
+        Attribute A = new Attribute(this.getMostImportantAttribute(attributeNames, examples), null);
+        DecisionTree tree = new DecisionTree(A);
+        for (Object value : examples.getValuesOf(A.getName())) {
+            DataSet exs = examples.find(A.getName(), value);
+            attributeNames.remove(A.getName()); // attributes - A
+            DecisionTree subtree = this.decisionTreeLearning(exs, attributeNames, examples);
+            tree.addBranch(value, subtree);
         }
-
         return tree;
     }
 
-    private DecisionTreeLeaf majorityValue(DataSet ds) {
+    /**
+     * Return plurality classification, "the most common output value among a
+     * set of examples, breaking ties randomly" page 702, AIMAv3. Uses
+     * MajorityLearner
+     *
+     * @param examples
+     * @return
+     */
+    private DecisionTreeLeaf getPluralityValue(DataSet examples) {
         Learner learner = new MajorityLearner();
-        learner.train(ds);
-        return new DecisionTreeLeaf(learner.predict(ds.getExample(0)));
+        learner.train(examples);
+        return new DecisionTreeLeaf(learner.predict(null));
     }
 
-    private String chooseAttribute(DataSet ds, List<String> attributeNames) {
+    /**
+     * Find the most important attribute; this method corresponds to "argmax_(a
+     * in attributes) IMPORTANCE(a, examples)" on page 702, AIMAv3. IMPORTANCE
+     * is implemented as the information gain of the attribute, see page 703.
+     *
+     * @param examples
+     * @param attributeNames
+     * @return
+     */
+    public String getMostImportantAttribute(List<String> attributeNames, DataSet examples) {
         double greatestGain = 0.0;
         String attributeWithGreatestGain = attributeNames.get(0);
-        for (String attr : attributeNames) {
-            double gain = ds.calculateGainFor(attr);
+        for (String attributeName : attributeNames) {
+            // IMPORTANCE(a, examples) is implemented as the information gain of the attribute, page 703
+            double gain = examples.getInformationGainOf(attributeName);
             if (gain > greatestGain) {
                 greatestGain = gain;
-                attributeWithGreatestGain = attr;
+                attributeWithGreatestGain = attributeName;
             }
         }
-
         return attributeWithGreatestGain;
     }
 
-    private boolean allExamplesHaveSameClassification(DataSet ds) {
-        String classification = ds.getExample(0).targetValue();
-        Iterator<Example> iter = ds.iterator();
+    /**
+     * Test the example set for classification; if all examples have the same
+     * output, return true.
+     *
+     * @param examples
+     * @return
+     */
+    private boolean allExamplesHaveSameClassification(DataSet examples) {
+        Object classification = examples.getExample(0).getOutput();
+        Iterator<Example> iter = examples.iterator();
         while (iter.hasNext()) {
             Example element = iter.next();
-            if (!(element.targetValue().equals(classification))) {
+            if (!element.getOutput().equals(classification)) {
                 return false;
             }
 
         }
         return true;
+    }
+
+    /**
+     * Induces the decision tree from the specified set of examples
+     *
+     * @param examples a set of examples for constructing the decision tree
+     */
+    @Override
+    public void train(DataSet examples) {
+        // get attribute names
+        ArrayList<String> attributes = new ArrayList<String>();
+        for (Attribute a : examples.getExample(0).getAttributes()) {
+            attributes.add(a.getName());
+        }
+        // train
+        this.trainedTree = decisionTreeLearning(examples, attributes, null);
+    }
+
+    /**
+     * Predict a result using the trained decision tree
+     *
+     * @param e
+     * @return
+     */
+    @Override
+    public <T> T predict(Example e) {
+        if (this.trainedTree == null) {
+            throw new RuntimeException("DecisionTreeLearner has not yet been trained with an example set.");
+        }
+        return (T) this.trainedTree.predict(e);
+    }
+
+    /**
+     * Return the accuracy of the decision tree on the specified set of
+     * examples
+     *
+     * @param examples
+     * @return
+     */
+    @Override
+    public int[] test(DataSet examples) {
+        int[] results = new int[]{0, 0};
+        for (Example e : examples) {
+            if (e.getOutput().equals(this.trainedTree.predict(e))) {
+                results[0]++;
+            } else {
+                results[1]++;
+            }
+        }
+        return results;
     }
 }

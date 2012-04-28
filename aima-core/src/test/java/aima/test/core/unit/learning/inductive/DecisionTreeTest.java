@@ -12,10 +12,10 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 /**
-* DecisionTreeTest
-*
-* @author Andrew Brown
-*/
+ * DecisionTreeTest
+ *
+ * @author Andrew Brown
+ */
 public class DecisionTreeTest {
 
     @Before
@@ -23,8 +23,8 @@ public class DecisionTreeTest {
     }
 
     /**
-* Test predictions
-*/
+     * Test predictions
+     */
     @Test
     public void testPredict() {
         // get restaurant data
@@ -66,8 +66,8 @@ public class DecisionTreeTest {
     }
 
     /**
-* Demonstrate toString() usage
-*/
+     * Demonstrate toString() usage
+     */
     @Test
     public void testToString() {
         // create tree
@@ -81,12 +81,12 @@ public class DecisionTreeTest {
         // test
         Assert.assertEquals(
                 "|- Price" + "\n"
-                + " |- $$$" + "\n"
-                + " |- Est" + "\n"
-                + " |- 0-10" + "\n"
-                + " |- Type" + "\n"
-                + " |- French -> Yes" + "\n"
-                + " |- >60 -> No" + "\n",
+                + "  |- $$$" + "\n"
+                + "  |- Est" + "\n"
+                + "    |- 0-10" + "\n"
+                + "    |- Type" + "\n"
+                + "      |- French -> Yes" + "\n"
+                + "    |- >60 -> No" + "\n",
                 t1.toString());
     }
 }

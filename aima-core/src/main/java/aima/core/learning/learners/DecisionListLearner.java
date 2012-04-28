@@ -1,18 +1,18 @@
 package aima.core.learning.learners;
+
 import aima.core.learning.framework.Attribute;
-import java.util.List;
 import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.framework.Learner;
-import aima.core.learning.inductive.DecisionListTest;
 import aima.core.learning.inductive.DecisionList;
-import java.util.ArrayList;
+import aima.core.learning.inductive.DecisionListTest;
 import java.util.HashSet;
 
 /**
- * Uses DECISION-LIST-LEARNING algorithm, page 717, AIMAv3, to build a series
- * of tests (DecisionListTest); the chain of tests is used to predict outcomes
- * for new examples.
+ * Uses DECISION-LIST-LEARNING algorithm, page 717, AIMAv3, to build a series of
+ * tests (DecisionListTest); the chain of tests is used to predict outcomes for
+ * new examples.
+ *
  * @author Ravi Mohan
  * @author Mike Stampone
  * @author Andrew Brown
@@ -20,7 +20,7 @@ import java.util.HashSet;
 public class DecisionListLearner implements Learner {
 
     private DecisionList decisionList;
-    private ArrayList<DecisionListTest> possibleTests;
+    private HashSet<Attribute> possibleAttributes;
 
     /**
      * Constructor
@@ -30,156 +30,133 @@ public class DecisionListLearner implements Learner {
 
     /**
      * Return the decision list for this learner
+     *
      * @return
      */
     public DecisionList getDecisionList() {
-        return decisionList;
+        return this.decisionList;
     }
-    
+
     /**
-     * Implement DECISION-LIST-LEARNING, page 717, AIMAv3
-     * <br/>
+     * Implement DECISION-LIST-LEARNING, page 717, AIMAv3 <br/>
      * <pre>
      * function DECISION-LIST-LEARNING(examples) returns a decision list, or failure
-     *  if examples is empty then return the trivial decision list "No"
-     *  t &lt;- a test that matches a nonempty subset examples_t of examples, such that the members of examples_t are all positive or negative
-     *  if there is no such t then return failure
-     *  if the examples in examples_t are positive then o &lt- Yes else o &lt;- No
-     *  return a decision list with initial test t and outcome o and remaining tests given by DECISION-LIST-LEARNING(examples - examples_t)
+     * if examples is empty then return the trivial decision list "No"
+     * t &lt;- a test that matches a nonempty subset examples_t of examples, such that the members of examples_t are all positive or negative
+     * if there is no such t then return failure
+     * if the examples in examples_t are positive then o &lt- Yes else o &lt;- No
+     * return a decision list with initial test t and outcome o and remaining tests given by DECISION-LIST-LEARNING(examples - examples_t)
      * </pre>
+     *
      * @param examples
-     * @return 
+     * @return
      */
     public DecisionList decisionListLearning(DataSet examples) {
         if (examples.size() == 0) {
             return new DecisionList();
         }
-        List<DecisionListTest> possibleTests = testFactory.createDLTestsWithAttributeCount(examples, 1);
-        DecisionListTest test = getValidTest(possibleTests, examples);
-        if (test == null) {
+        // find test that returns largest list of positive or negative results
+        DecisionListTest t = this.getLargestClassifyingTest(examples);
+        // check t
+        if (t == null) {
             return new DecisionList();
         }
-        // at this point there is a test that classifies some subset of examples
-        // with the same target value
-        DataSet matched = test.getMatchingExamples(examples);
+        //
+        DataSet matched = t.getMatchingExamples(examples);
+        // set positive
+        if (matched.examples.get(0).getOutput() != null) {
+            t.setOutput(matched.examples.get(0).getOutput());
+        } // set negative
+        else {
+            t.setOutput(null);
+        }
+        // return
         DecisionList list = new DecisionList();
-        list.add(test, matched.getExample(0).targetValue());
-        return list.mergeWith(decisionListLearning(test.getNonMatchingExamples(examples)));
+        list.add(t);
+        return list.mergeWith(this.decisionListLearning(t.getNonMatchingExamples(examples)));
     }
-    
-    private ArrayList<DecisionListTest> getPossibleTests(DataSet examples, int k){
-        if( possibleTests == null){
-            
-            possibleTests = new ArrayList<DecisionListTest>();
-            Attribute[] possibleAttributes = examples.getPossibleAttributes().toArray(new Attribute[0]);
-            // create tests of up to k attribute size:
-            for(int h = 1; h <= k; h++){
-                DecisionListTest test = new DecisionListTest();
-                // loop through possibles...
-                for(int i = 0; i < possibleAttributes.length; i++){
-                    // ...picking h attributes each time
-                    for(int j = 0; j < h; j++){
-                        int index = i + j;
-                        if( index < possibleAttributes.length ) test.add(possibleAttributes[index]);
-                    }
-                }
-                // add to possible Tests
-            }            
-        }
-        return possibleTests;
-    }
-    
-    private DecisionListTest getValidTest(List<DecisionListTest> possibleTests, DataSet ds) {
-        for (DecisionListTest test : possibleTests) {
-            DataSet matched = test.getMatchingExamples(ds);
-            if (!(matched.size() == 0)) {
-                if (allExamplesHaveSameTargetValue(matched)) {
-                    return test;
-                }
-            }
 
+    /**
+     * Return first test that classifies a subset of examples returning the same
+     * value
+     * @todo examine 2-, 3-, k-attribute tests
+     *
+     * @param examples
+     * @return
+     */
+    private DecisionListTest getLargestClassifyingTest(DataSet examples) {
+        // attempt all single attribute tests
+        for (Attribute a : examples.getPossibleAttributes()) {
+            DecisionListTest test = new DecisionListTest();
+            test.add(a);
+            DataSet matched = test.getMatchingExamples(examples);
+            if (matched.size() > 0 && this.allExamplesHaveSameOutput(matched)) {
+                test.setOutput(matched.getExample(0).getOutput());
+                return test;
+            }
         }
+        // return
         return null;
     }
 
-    private boolean allExamplesHaveSameTargetValue(DataSet matched) {
-        // assumes at least i example in dataset
-        String targetValue = matched.getExample(0).targetValue();
+    /**
+     * Test whether all of the examples in an example set return the same output
+     *
+     * @param matched
+     * @return
+     */
+    private boolean allExamplesHaveSameOutput(DataSet matched) {
+        Object value = matched.getExample(0).getOutput();
         for (Example e : matched.examples) {
-            if (!(e.targetValue().equals(targetValue))) {
+            if (!e.getOutput().equals(value)) {
                 return false;
             }
         }
         return true;
     }
-    
-    
+
     /**
      * Trains the decision list given a set of examples
+     *
      * @param examples
      */
     @Override
     public void train(DataSet examples) {
-        this.decisionList = decisionListLearning(examples);
+        this.decisionList = this.decisionListLearning(examples);
     }
 
     /**
      * Predict an outcome for the given example
+     *
      * @param e
      * @return the example's output value, or null
      */
     @Override
     public Object predict(Example e) {
-        if (decisionList == null) {
+        if (this.decisionList == null) {
             throw new RuntimeException("DecisionListLearner has not yet been trained with a data set.");
         }
         // predict and return
-        if( decisionList.predict(e) ){
-            return e.getOutput();
-        }
-        else{
-            return null;
-        }
+        return this.decisionList.predict(e);
     }
 
     /**
      * Returns the accuracy of the hypothesis on the specified set of examples
+     *
      * @param examples the test data set.
-     * @return the accuracy of the hypothesis on the specified set of examples as an array like [#correct, #incorrect]
+     * @return the accuracy of the hypothesis on the specified set of examples
+     * as an array like [#correct, #incorrect]
      */
     @Override
     public int[] test(DataSet examples) {
         int[] results = new int[]{0, 0};
         for (Example e : examples) {
-            if (e.getOutput().equals(decisionList.predict(e))) {
+            if (e.getOutput().equals(this.decisionList.predict(e))) {
                 results[0]++;
             } else {
                 results[1]++;
             }
         }
         return results;
-    }
-
-
-
-    public List<DecisionListTest> createDLTestsWithAttributeCount(DataSet ds, int i) {
-        if (i != 1) {
-            throw new RuntimeException(
-                    "For now DLTests with only 1 attribute can be craeted , not"
-                    + i);
-        }
-        List<String> nonTargetAttributes = ds.getNonTargetAttributes();
-        List<DecisionListTest> tests = new ArrayList<DecisionListTest>();
-        for (String ntAttribute : nonTargetAttributes) {
-            List<String> ntaValues = ds.getPossibleAttributeValues(ntAttribute);
-            for (String ntaValue : ntaValues) {
-
-                DecisionListTest test = new DecisionListTest();
-                test.add(ntAttribute, ntaValue);
-                tests.add(test);
-
-            }
-        }
-        return tests;
     }
 }

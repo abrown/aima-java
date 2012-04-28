@@ -1,9 +1,9 @@
 package aima.core.learning.inductive;
 
 import aima.core.learning.framework.Attribute;
-import java.util.HashMap;
 import aima.core.learning.framework.Example;
 import aima.core.util.Util;
+import java.util.HashMap;
 
 /**
  * Represents a decision tree, figure 18.2, page 699, AIMAv3. The book 
@@ -32,7 +32,7 @@ public class DecisionTree<E> {
     /**
      * Constructor
      */
-    protected DecisionTree() {
+    public DecisionTree() {
     }
 
     /**
@@ -82,7 +82,7 @@ public class DecisionTree<E> {
      * @param value
      * @param tree 
      */
-    public void addNode(E value, DecisionTree tree) {
+    public void addBranch(E value, DecisionTree tree) {
         this.branches.put(value, tree);
     }
 
@@ -91,13 +91,13 @@ public class DecisionTree<E> {
      * @param e
      * @return 
      */
-    public Object predict(Example e) {
+    public E predict(Example e) {
         // setup
         String attributeName = this.getAttribute().getName();
         E attributeValue = (E) e.get(attributeName).getValue();
         // match
         if (this.branches.containsKey(attributeValue)) {
-            return this.branches.get(attributeValue).predict(e); // continue down tree
+            return (E) this.branches.get(attributeValue).predict(e); // continue down tree
         } else {
             throw new RuntimeException("No branch for value: " + attributeValue);
         }
@@ -109,7 +109,7 @@ public class DecisionTree<E> {
      */
     @Override
     public String toString() {
-        return toString(1, new StringBuilder());
+        return toString(0, new StringBuilder());
     }
 
     /**
@@ -120,15 +120,25 @@ public class DecisionTree<E> {
      */
     public String toString(int depth, StringBuilder s) {
         if (this.getAttribute().getName() != null) {
-            s.append(Util.ntimes("\t", depth));
-            s.append(Util.ntimes("***", 1));
-            s.append(this.getAttribute().getName() + " \n");
+            s.append("[");
+            s.append(this.getAttribute().getName());
+            s.append("]");
+            s.append("\n");
             for (E attributeValue : this.branches.keySet()) {
-                s.append(Util.ntimes("\t", depth + 1));
-                s.append("+" + attributeValue);
-                s.append("\n");
+                s.append(Util.ntimes("  ", depth + 1));
+                s.append("|- ");
+                s.append(attributeValue);
+                s.append(" -> ");
                 DecisionTree child = this.branches.get(attributeValue);
-                s.append(child.toString(depth + 1, new StringBuilder()));
+                if( child instanceof DecisionTreeLeaf){
+                    s.append(child);
+                    s.append("\n");
+                }
+                else{
+                    s.append("\n");
+                    s.append(Util.ntimes("  ", depth + 1));
+                    s.append(child.toString(depth + 1, new StringBuilder()));
+                }
             }
         }
         return s.toString();
