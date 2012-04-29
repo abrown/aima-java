@@ -9,54 +9,56 @@ import aima.core.learning.reinforcement.PerceptStateReward;
  * to be instantiated per agent within the environment. However, if an agent
  * tracks its perceived percepts it will need to explicitly copy the relevant
  * information.
- * 
- * @author oreilly
- * 
+ *
+ * @author Ciaran O'Reilly
  */
 public class CellWorldPercept implements PerceptStateReward<Cell<Double>> {
-	private Cell<Double> cell = null;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param cell
-	 *            the cell within the environment that the percept refers to.
-	 */
-	public CellWorldPercept(Cell<Double> cell) {
-		this.cell = cell;
-	}
+    private Cell<Double> cell = null;
 
-	/**
-	 * 
-	 * @return the cell within the environment that the percept refers to.
-	 */
-	public Cell<Double> getCell() {
-		return cell;
-	}
+    /**
+     * Constructor.
+     *
+     * @param cell the cell within the environment that the percept refers to.
+     */
+    public CellWorldPercept(Cell<Double> cell) {
+        this.cell = cell;
+    }
 
-	/**
-	 * Set the cell within the environment that the percept refers to.
-	 * 
-	 * @param cell
-	 *            the cell within the environment that the percept refers to.
-	 */
-	public void setCell(Cell<Double> cell) {
-		this.cell = cell;
-	}
+    /**
+     *
+     * @return the cell within the environment that the percept refers to.
+     */
+    public Cell<Double> getCell() {
+        return cell;
+    }
 
-	//
-	// START-PerceptStateReward
+    /**
+     * Set the cell within the environment that the percept refers to.
+     *
+     * @param cell the cell within the environment that the percept refers to.
+     */
+    public void setCell(Cell<Double> cell) {
+        this.cell = cell;
+    }
 
-	@Override
-	public double reward() {
-		return cell.getContent().doubleValue();
-	}
+    /**
+     * Return reward
+     *
+     * @return
+     */
+    @Override
+    public double reward() {
+        return cell.getContent().doubleValue();
+    }
 
-	@Override
-	public Cell<Double> state() {
-		return cell;
-	}
-
-	// END-PerceptStateReward
-	//
+    /**
+     * Return state
+     *
+     * @return
+     */
+    @Override
+    public Cell<Double> state() {
+        return cell;
+    }
 }
