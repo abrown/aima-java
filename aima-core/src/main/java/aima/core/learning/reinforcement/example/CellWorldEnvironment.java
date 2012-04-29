@@ -17,7 +17,6 @@ import java.util.Set;
  * trials for reinforcement learning agents.
  *
  * @author Ciaran O'Reilly
- *
  */
 public class CellWorldEnvironment extends AbstractEnvironment {
 
