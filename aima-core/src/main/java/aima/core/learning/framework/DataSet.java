@@ -58,7 +58,7 @@ public class DataSet implements Iterable<Example>, Cloneable {
     }
 
     /**
-     * Removes the example given from the data set @todo remove this
+     * Removes the example given from the data set
      *
      * @param e
      * @return
