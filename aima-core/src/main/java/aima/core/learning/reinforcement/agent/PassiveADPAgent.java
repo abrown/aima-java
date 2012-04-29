@@ -49,8 +49,8 @@ import java.util.Set;
  *
  */
 public class PassiveADPAgent<S, A extends Action> extends ReinforcementAgent<S, A> {
-    // persistent: &pi;, a fixed policy
 
+    // persistent: &pi;, a fixed policy
     private Map<S, A> pi = new HashMap<S, A>();
     // mdp, an MDP with model P, rewards R, discount &gamma;
     private MDP<S, A> mdp = null;
