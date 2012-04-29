@@ -10,7 +10,6 @@ import java.util.Map;
  * An implementation of the EnvironmentState interface for a Cell World.
  *
  * @author Ciaran O'Reilly
- *
  */
 public class CellWorldEnvironmentState implements EnvironmentState {
 
