@@ -6,7 +6,6 @@ package aima.core.learning.framework;
  * of feedback (unsupervised, reinforcement, supervised) used to train the 
  * learner.
  * @todo should implement aima.core.agent.Agent
- * @todo should predict a generic type; prediction values will not always be String
  * @author Ravi Mohan
  * @author Andrew Brown
  */
