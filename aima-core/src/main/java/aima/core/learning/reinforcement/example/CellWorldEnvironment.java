@@ -71,11 +71,23 @@ public class CellWorldEnvironment extends AbstractEnvironment {
         stepUntilDone();
     }
 
+    /**
+     * Return current state
+     *
+     * @return
+     */
     @Override
     public EnvironmentState getCurrentState() {
         return currentState;
     }
 
+    /**
+     * Execute an action, returning a new state
+     *
+     * @param agent
+     * @param action
+     * @return
+     */
     @Override
     public EnvironmentState executeAction(Agent agent, Action action) {
         if (!action.isNoOp()) {
@@ -102,6 +114,12 @@ public class CellWorldEnvironment extends AbstractEnvironment {
         return currentState;
     }
 
+    /**
+     * Collect percept
+     *
+     * @param anAgent
+     * @return
+     */
     @Override
     public Percept getPerceptSeenBy(Agent anAgent) {
         return currentState.getPerceptFor(anAgent);
