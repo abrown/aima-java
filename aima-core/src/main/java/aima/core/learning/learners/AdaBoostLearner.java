@@ -38,7 +38,7 @@ public class AdaBoostLearner implements Learner {
     }
 
     /**
-     * Train the learners @todo make this look like page 751; create adaBoost()
+     * Train the learners according to page 751, AIMAv3.
      * <pre><code>
      * function ADABOOST(examples, L, K) returns a weighted-majority hypothesis
      *  inputs: examples, a set of N labeled examples (x_1, y_1), ..., (x_N, y_N)
@@ -100,7 +100,7 @@ public class AdaBoostLearner implements Learner {
     }
 
     /**
-     * Train
+     * Train this learning ensemble
      *
      * @param examples
      */
@@ -110,7 +110,7 @@ public class AdaBoostLearner implements Learner {
     }
 
     /**
-     * Predict
+     * Predict a result based on the trained ensemble
      *
      * @param e
      * @return
