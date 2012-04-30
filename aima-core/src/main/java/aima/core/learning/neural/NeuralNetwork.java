@@ -20,10 +20,12 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
     public static final byte SENDING = 2;
     public static final byte COMPLETE = 3;
     public static final byte TRAINING = 4;
+    
     /**
      * Turns on debugging
      */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
+    
     /**
      * List of interconnected layers
      */
