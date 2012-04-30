@@ -52,8 +52,8 @@ public abstract class ReinforcementAgent<S, A extends Action> extends AbstractAg
     /**
      * Return the action to execute given the current percept
      *
-     * @param p
-     * @return
+     * @param p the current percept
+     * @return the action to execute
      */
     @SuppressWarnings("unchecked")
     @Override
