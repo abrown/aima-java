@@ -27,6 +27,14 @@ public class WeightedMajorityLearner implements Learner {
         this.hypotheses = hypotheses;
         this.weights = weights;
     }
+    
+    /**
+     * Return hypotheses
+     * @return 
+     */
+    public Learner[] getHypotheses(){
+        return this.hypotheses;
+    }
 
     /**
      * Train this learner to return the most common example output.
@@ -62,8 +70,8 @@ public class WeightedMajorityLearner implements Learner {
             values.put(value, total + weight);
         }
         // find weighted majority
-        T majorityOutput = null;
-        double maxTotal = 0.0;
+        T majorityOutput = this.hypotheses[0].predict(e);
+        double maxTotal = Double.NEGATIVE_INFINITY;
         for (T value : values.keySet()) {
             double total = values.get(value);
             if (total > maxTotal) {
