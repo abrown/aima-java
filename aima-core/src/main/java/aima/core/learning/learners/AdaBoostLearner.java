@@ -38,6 +38,15 @@ public class AdaBoostLearner implements Learner {
     }
 
     /**
+     * Return ensemble
+     *
+     * @return
+     */
+    public WeightedMajorityLearner getEnsemble() {
+        return this.ensemble;
+    }
+
+    /**
      * Train the learners according to page 751, AIMAv3.
      * <pre><code>
      * function ADABOOST(examples, L, K) returns a weighted-majority hypothesis
@@ -66,17 +75,21 @@ public class AdaBoostLearner implements Learner {
         // initialize local variables
         int N = examples.size();
         double[] w = new double[N];
-        Arrays.fill(w, 1 / N);
+        Arrays.fill(w, 1);
         Learner[] h = new Learner[K];
         try {
-            Arrays.fill(h, L.getConstructor().newInstance());
+            for(int k=0; k < K; k++){
+                h[k] = L.getConstructor().newInstance();
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         double[] z = new double[K];
         // for each K
         for (int k = 0; k < K; k++) {
-            h[k].train(examples); // @todo h[k] <- L(examples, w); w not really implemented here; each Learner will be identical
+            // @todo h[k] <- L(examples, w); w not really implemented here; each Learner will be identical
+            // @todo try WeightedLearner, where we combine Learner and a weight set for examples; or try a replicated training set, page 749
+            h[k].train(examples); 
             double error = 0;
             for (int j = 0; j < N; j++) {
                 Object x_j = h[k].predict(examples.getExample(j));
