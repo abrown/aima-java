@@ -183,7 +183,9 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
      */
     public static NeuralNetwork load(File file) throws java.io.IOException, java.io.FileNotFoundException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
-        return (NeuralNetwork) in.readObject();
+        NeuralNetwork net = (NeuralNetwork) in.readObject();
+        in.close();
+        return net;
     }
 
     /**
