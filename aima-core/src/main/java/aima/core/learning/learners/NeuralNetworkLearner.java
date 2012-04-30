@@ -37,18 +37,18 @@ public class NeuralNetworkLearner implements Learner {
     public void train(DataSet examples) {
         // check
         Example first = examples.getExample(0);
-        if (!(first.get("INPUT").getValue() instanceof double[])) {
+        if (!(first.get("INPUT").getValue() instanceof Double[])) {
             throw new RuntimeException("NeuralNetworkLearner inputs must be passed as a Double[] in the \"INPUT\" attribute");
         }
-        if (!(first.getOutput() instanceof double[])) {
+        if (!(first.getOutput() instanceof Double[])) {
             throw new RuntimeException("NeuralNetworkLearner output must be set to a Double[]");
         }
         // convert example set
         DataList[] inputs = new DataList[examples.size()];
         DataList[] outputs = new DataList[examples.size()];
         for (int i = 0; i < examples.size(); i++) {
-            inputs[i] = new DataList((double[]) examples.getExample(i).get("INPUT").getValue());
-            outputs[i] = new DataList((double[]) examples.getExample(i).getOutput());
+            inputs[i] = new DataList((Double[]) examples.getExample(i).get("INPUT").getValue());
+            outputs[i] = new DataList((Double[]) examples.getExample(i).getOutput());
         }
         // train
         try {
@@ -70,10 +70,10 @@ public class NeuralNetworkLearner implements Learner {
     @Override
     public Double[] predict(Example e) {
         // check
-        if (!(e.get("INPUT").getValue() instanceof double[])) {
+        if (!(e.get("INPUT").getValue() instanceof Double[])) {
             throw new RuntimeException("NeuralNetworkLearner inputs must be passed as a Double[] in the \"INPUT\" attribute");
         }
-        DataList in = new DataList((double[]) e.get("INPUT").getValue());
+        DataList in = new DataList((Double[]) e.get("INPUT").getValue());
         // use network
         try {
             DataList out = this.network.use(in);
@@ -97,15 +97,16 @@ public class NeuralNetworkLearner implements Learner {
     public int[] test(DataSet test_set) {
         // check
         Example first = test_set.getExample(0);
-        if (!(first.get("INPUT").getValue() instanceof double[])) {
+        if (!(first.get("INPUT").getValue() instanceof Double[])) {
             throw new RuntimeException("NeuralNetworkLearner inputs must be passed as a Double[] in the \"INPUT\" attribute");
         }
-        if (!(first.getOutput() instanceof double[])) {
+        if (!(first.getOutput() instanceof Double[])) {
             throw new RuntimeException("NeuralNetworkLearner output must be set to a Double[]");
         }
         // test
         int[] results = new int[]{0, 0};
         for (Example e : test_set) {
+            System.out.println(Arrays.toString(this.predict(e)));
             if (Arrays.equals((Double[]) e.getOutput(), this.predict(e))) {
                 results[0]++;
             } else {
