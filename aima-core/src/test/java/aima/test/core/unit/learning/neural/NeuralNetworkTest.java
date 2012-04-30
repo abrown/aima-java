@@ -1,13 +1,15 @@
 package aima.test.core.unit.learning.neural;
 
+import aima.core.learning.neural.*;
 import java.io.File;
+import junit.framework.Assert;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import aima.core.learning.neural.*;
 
 /**
  * Tests neural network functionality
+ *
  * @author andrew
  */
 public class NeuralNetworkTest {
@@ -29,8 +31,10 @@ public class NeuralNetworkTest {
                 0.15, 0.16, 0.17, 0.18, 0.19);
         // use
         DataList result = this.n.use(input);
-        System.out.println(result.toString());
-        // test...
+        // test
+        for (Double d : result) {
+            Assert.assertTrue(d == 1.0 || d == 0.0);
+        }
     }
 
     /**
@@ -66,8 +70,9 @@ public class NeuralNetworkTest {
     /**
      * Demonstrates the functionality of NeuralNetwork by implementing the
      * example two-bit adder from page 729, AIMA 3ed.
+     *
      * @throws SizeDifferenceException
-     * @throws WrongSizeException 
+     * @throws WrongSizeException
      */
     @Test
     public void testBackPropagationAdder() throws SizeDifferenceException, WrongSizeException {
