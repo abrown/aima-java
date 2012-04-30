@@ -7,7 +7,8 @@ import java.util.NoSuchElementException;
 
 /**
  * Neural network layer
- * @author andrew
+ *
+ * @author Andrew Brown
  */
 public class Layer implements Iterable<Perceptron>, Serializable {
 
@@ -18,6 +19,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Constructor
+     *
      * @param count
      * @param g
      */
@@ -33,6 +35,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
     /**
      * Connects a layer to another layer; every perceptron is connected to every
      * perceptron in the next layer
+     *
      * @param downstream
      */
     public void connectTo(Layer downstream) {
@@ -45,6 +48,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Sends initial input data into the network
+     *
      * @param input
      * @throws SizeDifferenceException
      */
@@ -60,6 +64,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Receives final output data from the network
+     *
      * @return
      */
     public DataList out() {
@@ -84,6 +89,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Backpropagates errors from the given correct result
+     *
      * @param expected_output
      * @throws SizeDifferenceException a
      */
@@ -99,6 +105,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Returns the number of perceptrons in this layer
+     *
      * @return
      */
     public int size() {
@@ -107,8 +114,10 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
     /**
      * Makes the layer Iterable
+     *
      * @return
      */
+    @Override
     public LayerIterator iterator() {
         return new LayerIterator();
     }
@@ -125,16 +134,20 @@ public class Layer implements Iterable<Perceptron>, Serializable {
 
         /**
          * Checks whether the list is empty or ended
+         *
          * @return
          */
+        @Override
         public boolean hasNext() {
             return (this.index < Layer.this.perceptrons.size());
         }
 
         /**
          * Returns the next element
+         *
          * @return
          */
+        @Override
         public Perceptron next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException();
@@ -147,6 +160,7 @@ public class Layer implements Iterable<Perceptron>, Serializable {
         /**
          * Removes an element; not supported in this implementation
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

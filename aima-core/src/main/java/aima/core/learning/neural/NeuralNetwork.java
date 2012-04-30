@@ -7,7 +7,8 @@ import java.util.NoSuchElementException;
 
 /**
  * Neural network
- * @author andrew
+ *
+ * @author Andrew Brown
  */
 public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
@@ -30,6 +31,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Constructor
+     *
      * @param number_of_layers
      * @param perceptrons_per_layer
      * @param function
@@ -51,10 +53,11 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
     /**
      * Uses the neural network to determine the output for the given input;
      * sends the input, returns the output
+     *
      * @param input
-     * @return 
+     * @return
      * @throws SizeDifferenceException
-     * @throws WrongSizeException 
+     * @throws WrongSizeException
      */
     public DataList use(DataList input) throws SizeDifferenceException, WrongSizeException {
         // send input
@@ -67,6 +70,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Trains a network against a given dataset
+     *
      * @param input
      * @param expected_output
      * @return the number of iterations spent training the network
@@ -98,6 +102,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Tests multiple datasets, returning the average error
+     *
      * @param inputs
      * @param outputs
      * @return a proportion, average of correct results to total results
@@ -119,11 +124,12 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Test a single dataset for correctness
+     *
      * @param input
      * @param expected_output
      * @return a proportion, correct results to total results
      * @throws SizeDifferenceException
-     * @throws WrongSizeException 
+     * @throws WrongSizeException
      */
     public double test(DataList input, DataList expected_output) throws SizeDifferenceException, WrongSizeException {
         DataList out = this.use(input);
@@ -132,6 +138,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Returns the first layer in this network
+     *
      * @return the first layer
      */
     public Layer first() {
@@ -140,6 +147,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Returns the last layer in this network
+     *
      * @return the last layer
      */
     public Layer last() {
@@ -149,10 +157,11 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Saves a given neural network to file
+     *
      * @param file
      * @param net
      * @throws java.io.IOException
-     * @throws java.io.FileNotFoundException 
+     * @throws java.io.FileNotFoundException
      */
     public static void save(File file, NeuralNetwork net) throws java.io.IOException, java.io.FileNotFoundException {
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
@@ -163,11 +172,12 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Loads a network from file
+     *
      * @param file
      * @return
      * @throws java.io.IOException
      * @throws java.io.FileNotFoundException
-     * @throws ClassNotFoundException 
+     * @throws ClassNotFoundException
      */
     public static NeuralNetwork load(File file) throws java.io.IOException, java.io.FileNotFoundException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
@@ -176,8 +186,10 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
     /**
      * Makes the network Iterable
+     *
      * @return
      */
+    @Override
     public NeuralNetworkIterator iterator() {
         return new NeuralNetworkIterator();
     }
@@ -194,16 +206,20 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
 
         /**
          * Checks whether the list is empty or ended
+         *
          * @return
          */
+        @Override
         public boolean hasNext() {
             return (this.index < NeuralNetwork.this.layers.size());
         }
 
         /**
          * Returns the next element
+         *
          * @return
          */
+        @Override
         public Layer next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException();
@@ -216,6 +232,7 @@ public class NeuralNetwork implements Iterable<Layer>, Serializable {
         /**
          * Removes an element; not supported in this implementation
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

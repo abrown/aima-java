@@ -5,20 +5,22 @@ import java.util.ArrayList;
 /**
  * Extends an ArrayList to simplify network input and output; with this class,
  * we avoid multi-dimensional arrays and simplify creation of network inputs.
- * @author andrew
+ *
+ * @author Andrew Brown
  */
 public class DataList extends ArrayList<Double> {
 
     /**
-     * Difference between doubles under which they will still be considered equal
+     * Difference between doubles under which they will still be considered
+     * equal
      */
     public static double tolerance = 0.000001;
 
     /**
-     * Constructor; pass elements as parameters
-     * @example
-     * DataList d = new DataList(0.1, 0.2, 0.3, 0.4);
-     * @param set 
+     * Constructor; pass elements as parameters @example DataList d = new
+     * DataList(0.1, 0.2, 0.3, 0.4);
+     *
+     * @param set
      */
     public DataList(Double... values) {
         for (Double d : values) {
@@ -28,7 +30,8 @@ public class DataList extends ArrayList<Double> {
 
     /**
      * Constructor
-     * @param set 
+     *
+     * @param set
      */
     public DataList(double[] set) {
         for (double d : set) {
@@ -38,7 +41,8 @@ public class DataList extends ArrayList<Double> {
 
     /**
      * Constructor
-     * @param set 
+     *
+     * @param set
      */
     public DataList(ArrayList<Double> set) {
         for (Double d : set) {
@@ -48,7 +52,8 @@ public class DataList extends ArrayList<Double> {
 
     /**
      * Constructor
-     * @param size 
+     *
+     * @param size
      */
     public DataList(int size) {
         super(size);
@@ -56,10 +61,11 @@ public class DataList extends ArrayList<Double> {
 
     /**
      * Calculate error rate between two datasets
+     *
      * @param actual
      * @param expected
      * @return
-     * @throws SizeDifferenceException 
+     * @throws SizeDifferenceException
      */
     public static double getErrorRate(DataList actual, DataList expected) throws SizeDifferenceException {
         if (actual.size() != expected.size()) {
@@ -75,13 +81,14 @@ public class DataList extends ArrayList<Double> {
         // return
         return errors / actual.size();
     }
-    
+
     /**
      * To Double Array
-     * @return 
+     *
+     * @return
      */
     @Override
-    public Double[] toArray(){
+    public Double[] toArray() {
         return this.toArray(new Double[1]);
     }
 }

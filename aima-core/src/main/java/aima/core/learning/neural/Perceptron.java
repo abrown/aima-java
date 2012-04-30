@@ -8,7 +8,8 @@ import java.util.NoSuchElementException;
 
 /**
  * Neural network perceptron
- * @author andrew
+ *
+ * @author Andrew Brown
  */
 public class Perceptron implements Iterable, Serializable {
 
@@ -25,6 +26,7 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Constructor
+     *
      * @param g
      */
     public Perceptron(ActivationFunctionInterface g, double sensitivity) {
@@ -55,6 +57,7 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Adds input perceptron with a random weight
+     *
      * @param p
      */
     public void addInput(Perceptron p) {
@@ -64,6 +67,7 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Adds input perceptron
+     *
      * @param p
      * @param weight
      */
@@ -76,7 +80,8 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Adds output perceptron
-     * @param p 
+     *
+     * @param p
      */
     public void addOutput(Perceptron p) {
         this.outputs.add(p);
@@ -86,9 +91,9 @@ public class Perceptron implements Iterable, Serializable {
     }
 
     /**
-     * Receives inputs from the governing application;
-     * implies there are no input perceptrons to this one;
-     * makes this perceptron an input node
+     * Receives inputs from the governing application; implies there are no
+     * input perceptrons to this one; makes this perceptron an input node
+     *
      * @param d an input value
      */
     public void in(double d) throws WrongSizeException {
@@ -108,8 +113,9 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Accepts inputs from an upstream perceptron
+     *
      * @param p
-     * @param d 
+     * @param d
      */
     public void in(Perceptron p, double d) {
         // change state
@@ -121,17 +127,17 @@ public class Perceptron implements Iterable, Serializable {
         // input
         this.activation.put(p, d);
         // send downstream once full
-        if ( this.activation.size() == this.inputs.size() ) {
+        if (this.activation.size() == this.inputs.size()) {
             // TODO: perhaps just test for activation here, not wait for all inputs to come in; this might be necessary in recurrent networks
             this.out();
         }
     }
 
     /**
-     * Send immediately, without activation function,
-     * the passed value; used for sending data from
-     * governing application; must only be used if this
+     * Send immediately, without activation function, the passed value; used for
+     * sending data from governing application; must only be used if this
      * perceptron is an input node
+     *
      * @param d
      */
     public void out(double d) {
@@ -148,8 +154,8 @@ public class Perceptron implements Iterable, Serializable {
     }
 
     /**
-     * Consumes input values and produces output 
-     * signal to downstream perceptrons. 
+     * Consumes input values and produces output signal to downstream
+     * perceptrons.
      */
     public void out() {
         // change state
@@ -176,12 +182,13 @@ public class Perceptron implements Iterable, Serializable {
     }
 
     /**
-     * Receives errors (w_i,j * delta_j) from downstream perceptrons
-     * and stores them until a backpropagation can be made. Please note 
-     * differences from AIMA 18.24, p.734, which assumes a 
-     * fully-connected network and the use of vectors.
+     * Receives errors (w_i,j * delta_j) from downstream perceptrons and stores
+     * them until a backpropagation can be made. Please note differences from
+     * AIMA 18.24, p.734, which assumes a fully-connected network and the use of
+     * vectors.
+     *
      * @param p
-     * @param error 
+     * @param error
      */
     public void backpropagate_in(Perceptron p, double error) {
         // save delta
@@ -193,26 +200,25 @@ public class Perceptron implements Iterable, Serializable {
     }
 
     /**
-     * Receives the correct training result from the application
-     * and calculates the error, backpropagating it to upstream
-     * perceptrons. Please note differences from
-     * AIMA 18.24, p.734, which assumes a fully-connected network
-     * and the use of vectors.
+     * Receives the correct training result from the application and calculates
+     * the error, backpropagating it to upstream perceptrons. Please note
+     * differences from AIMA 18.24, p.734, which assumes a fully-connected
+     * network and the use of vectors.
+     *
      * @param d correct result from example set
      */
     public void backpropagate_in(double y) {
         // calculate delta
-        double error = y - this.result; // y_j - a_j
-        this.error.put(null, error);
+        double _error = y - this.result; // y_j - a_j
+        this.error.put(null, _error);
         // send upstream immediately
         this.backpropagate_out();
     }
 
     /**
-     * Sends backpropagation results upstream, modifying each
-     * perceptrons weights on the way. Please note differences from
-     * AIMA 18.24, p.734, which assumes a fully-connected network
-     * and the use of vectors.
+     * Sends backpropagation results upstream, modifying each perceptrons
+     * weights on the way. Please note differences from AIMA 18.24, p.734, which
+     * assumes a fully-connected network and the use of vectors.
      */
     public void backpropagate_out() {
         // change state
@@ -260,7 +266,8 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Tests whether this perceptron has sent out an activation value
-     * @return 
+     *
+     * @return
      */
     public boolean isComplete() {
         return (this.state == NeuralNetwork.WAITING);
@@ -269,6 +276,7 @@ public class Perceptron implements Iterable, Serializable {
     /**
      * Returns string representation of a perceptron
      */
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder("Perceptron@");
         s.append(Integer.toHexString(this.hashCode()));
@@ -306,8 +314,10 @@ public class Perceptron implements Iterable, Serializable {
 
     /**
      * Makes the perceptron's inputs iterable
-     * @return 
+     *
+     * @return
      */
+    @Override
     public InputIterator iterator() {
         return new InputIterator();
     }
@@ -324,16 +334,20 @@ public class Perceptron implements Iterable, Serializable {
 
         /**
          * Checks whether the list is empty or ended
+         *
          * @return
          */
+        @Override
         public boolean hasNext() {
             return (this.index < Perceptron.this.inputs.size());
         }
 
         /**
          * Returns the next element
+         *
          * @return
          */
+        @Override
         public Perceptron next() {
             if (!this.hasNext()) {
                 throw new NoSuchElementException();
@@ -346,6 +360,7 @@ public class Perceptron implements Iterable, Serializable {
         /**
          * Removes an element; not supported in this implementation
          */
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
