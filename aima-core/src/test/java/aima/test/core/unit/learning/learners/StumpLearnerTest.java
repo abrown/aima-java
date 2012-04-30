@@ -52,4 +52,19 @@ public class StumpLearnerTest {
         }
         System.out.println();
     }
+    
+    /**
+     * Ensures the implementation of train() chooses random and distinct 
+     * attributes when trained multiple times agains the same example set
+     */
+    @Test
+    public void testThatDifferentAttributesChosen(){
+        String firstAttributeName = this.learners[0].getDecisionTree().getAttribute().getName();
+        int same = 0;
+        for(int i = 1; i < this.learners.length; i++){
+            String thisAttributeName = this.learners[i].getDecisionTree().getAttribute().getName();
+            if( firstAttributeName.equals(thisAttributeName)) same++;
+        }
+        Assert.assertTrue(same < 2);
+    }
 }
