@@ -61,6 +61,7 @@ public class NondeterministicProblem extends Problem {
      * Returns the description of what each action does.
      * @return the description of what each action does.
      */
+    @Override
     public ResultFunction getResultFunction() {
         throw new UnsupportedOperationException("Use getResultsFunction() for non-deterministic problems.");
     }

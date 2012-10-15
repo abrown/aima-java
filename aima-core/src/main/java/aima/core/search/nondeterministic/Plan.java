@@ -1,17 +1,24 @@
 package aima.core.search.nondeterministic;
+
+import aima.core.agent.Action;
+import aima.core.agent.State;
 import java.util.LinkedList;
 
 /**
  * Represents a solution plan for an AND-OR search; according to page 135, the
  * plan must be "a subtree that (1) has a goal node at every leaf, (2) specifies
- * one action at each of its OR nodes, and (3) includes every outcome branch at 
+ * one Object at each of its OR nodes, and (3) includes every outcome branch at
  * each of its AND nodes." As demonstrated on page 136, this subtree is
- * implemented as a linked list where every OR node is an action object--
- * satisfying (2)--and every AND node is an if-then-else chain--satisfying (3).
+ * implemented as a linked list where every OR node is an Object-- satisfying
+ * (2)--and every AND node is an if-then-else chain--satisfying (3).
+ *
  * @author Andrew Brown
  */
 public class Plan {
 
+    /**
+     * Each step can be an Action or an IfThen ?
+     */
     LinkedList<Object> steps = new LinkedList<Object>();
 
     /**
@@ -23,7 +30,8 @@ public class Plan {
 
     /**
      * Constructor
-     * @param step 
+     *
+     * @param step
      */
     public Plan(Object step) {
         this.steps.offerLast(step);
@@ -31,8 +39,9 @@ public class Plan {
 
     /**
      * Returns whether the plan contains the given step
+     *
      * @param step
-     * @return 
+     * @return
      */
     public boolean contains(Object step) {
         return this.steps.contains(step);
@@ -40,7 +49,8 @@ public class Plan {
 
     /**
      * Appends a step to the plan and returns itself
-     * @param step 
+     *
+     * @param step
      * @return
      */
     public Plan append(Object step) {
@@ -50,8 +60,9 @@ public class Plan {
 
     /**
      * Prepends a step to the plan and returns itself
+     *
      * @param step
-     * @return 
+     * @return
      */
     public Plan prepend(Object step) {
         this.steps.offerFirst(step);
@@ -59,9 +70,20 @@ public class Plan {
     }
 
     /**
-     * Returns the string representation of this plan
-     * @return 
+     * Determines whether this plan has any steps
+     *
+     * @return
      */
+    public boolean isEmpty() {
+        return this.steps.isEmpty();
+    }
+
+    /**
+     * Returns the string representation of this plan
+     *
+     * @return
+     */
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append("[");

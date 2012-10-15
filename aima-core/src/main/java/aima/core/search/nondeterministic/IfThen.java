@@ -1,9 +1,12 @@
 package aima.core.search.nondeterministic;
+
+import aima.core.agent.State;
 import java.util.ArrayList;
 
 /**
  * Represents a chain of if-then-else statements for use with AND-OR search;
  * explanation given on page 135.
+ *
  * @author Andrew Brown
  */
 public class IfThen {
@@ -12,8 +15,9 @@ public class IfThen {
 
     /**
      * Adds a conditional to the if-then chain
+     *
      * @param antecedent
-     * @param consequent 
+     * @param consequent
      */
     public void add(Object antecedent, Object consequent) {
         this.conditionals.add(new Conditional(antecedent, consequent));
@@ -21,8 +25,9 @@ public class IfThen {
 
     /**
      * Uses this if-then chain to return a result based on the given query
+     *
      * @param state
-     * @return 
+     * @return
      */
     public Object makeDecision(Object query) {
         // if-then
@@ -38,19 +43,24 @@ public class IfThen {
     /**
      * Returns a string representation of the if-then chain; see page 134 for
      * the book example.
-     * @return 
+     *
+     * @return
      */
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         // write if-then-else
         if (this.conditionals.size() > 1) {
             for (int i = 0; i < this.conditionals.size() - 1; i++) {
                 Conditional c = this.conditionals.get(i);
-                s.append("if ");
-                s.append(c.antecedent);
-                s.append(" then ");
-                s.append(c.consequent);
-                s.append(" else ");
+                Plan st = (Plan) c.consequent;
+                //if (!st.isEmpty()) {
+                    s.append("if ");
+                    s.append(c.antecedent);
+                    s.append(" then ");
+                    s.append(c.consequent);
+                    s.append(" else ");
+                //}
             }
         }
         // write last else
@@ -62,8 +72,9 @@ public class IfThen {
 }
 
 /**
- * Represents a simple conditional (if-then) statement internally for the if-then
- * chain.
+ * Represents a simple conditional (if-then) statement internally for the
+ * if-then chain.
+ *
  * @author Andrew Brown
  */
 class Conditional {
@@ -73,8 +84,9 @@ class Conditional {
 
     /**
      * Constructor
+     *
      * @param antecedent
-     * @param consequent 
+     * @param consequent
      */
     public Conditional(Object antecedent, Object consequent) {
         this.antecedent = antecedent;

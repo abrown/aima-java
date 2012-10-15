@@ -3,17 +3,20 @@ import aima.core.agent.Action;
 import aima.core.agent.Agent;
 import aima.core.agent.EnvironmentState;
 import aima.core.agent.Percept;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import aima.core.environment.vacuum.*;
-import aima.core.search.framework.*;
+import aima.core.environment.vacuum.VacuumEnvironment;
+import aima.core.environment.vacuum.VacuumEnvironmentState;
+import aima.core.search.framework.ActionsFunction;
+import aima.core.search.framework.GoalTest;
+import aima.core.search.framework.StepCostFunction;
 import aima.core.search.nondeterministic.AndOrSearch;
 import aima.core.search.nondeterministic.NondeterministicProblem;
 import aima.core.search.nondeterministic.Plan;
 import aima.core.search.nondeterministic.ResultsFunction;
 import java.util.HashSet;
 import java.util.Set;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Tests the AND-OR search algorithm using the erratic vacuum world of page 133,
@@ -85,6 +88,7 @@ public class AndOrSearchTest {
  */
 class NondeterministicVacuumEnvironment extends VacuumEnvironment {
 
+    @Override
     public EnvironmentState executeAction(Agent a, Action agentAction) {
         if (ACTION_MOVE_RIGHT == agentAction) {
             envState.setAgentLocation(a, LOCATION_B);
@@ -125,14 +129,17 @@ class NondeterministicVacuumEnvironment extends VacuumEnvironment {
  */
 class VacuumWorldAgent implements Agent {
 
+    @Override
     public Action execute(Percept percept) {
         return null;
     }
 
+    @Override
     public boolean isAlive() {
         return true;
     }
 
+    @Override
     public void setAlive(boolean alive) {
         // do nothing
     }
@@ -151,6 +158,7 @@ class VacuumWorldActions implements ActionsFunction {
      * @param s
      * @return 
      */
+    @Override
     public Set<Action> actions(Object s) {
         if (VacuumWorldActions.actions.isEmpty()) {
             VacuumWorldActions.actions.add(VacuumEnvironment.ACTION_SUCK);
@@ -183,6 +191,7 @@ class VacuumWorldResults implements ResultsFunction {
      * @param action
      * @return 
      */
+    @Override
     public Set<Object> results(Object _state, Action action) {
         // setup
         VacuumEnvironmentState state = (VacuumEnvironmentState) _state;
@@ -261,6 +270,7 @@ class VacuumWorldGoalTest implements GoalTest {
      * @param _state
      * @return 
      */
+    @Override
     public boolean isGoalState(Object _state) {
         // setup
         VacuumEnvironmentState state = (VacuumEnvironmentState) _state;
