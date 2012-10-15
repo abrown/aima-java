@@ -1,13 +1,13 @@
 package aima.core.environment.vacuum;
 
+import aima.core.agent.Agent;
+import aima.core.agent.EnvironmentState;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import aima.core.agent.Agent;
-import aima.core.agent.EnvironmentState;
-
 /**
  * Represents a state in the Vacuum World
+ *
  * @author Ciaran O'Reilly
  */
 public class VacuumEnvironmentState implements EnvironmentState {
@@ -25,8 +25,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Constructor
+     *
      * @param locAState
-     * @param locBState 
+     * @param locBState
      */
     public VacuumEnvironmentState(VacuumEnvironment.LocationState locAState,
             VacuumEnvironment.LocationState locBState) {
@@ -37,8 +38,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Returns the agent location
+     *
      * @param a
-     * @return 
+     * @return
      */
     public String getAgentLocation(Agent a) {
         return agentLocations.get(a);
@@ -46,8 +48,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Sets the agent location
+     *
      * @param a
-     * @param location 
+     * @param location
      */
     public void setAgentLocation(Agent a, String location) {
         agentLocations.put(a, location);
@@ -55,8 +58,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Returns the location state
+     *
      * @param location
-     * @return 
+     * @return
      */
     public VacuumEnvironment.LocationState getLocationState(String location) {
         return state.get(location);
@@ -64,8 +68,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Sets the location state
+     *
      * @param location
-     * @param s 
+     * @param s
      */
     public void setLocationState(String location,
             VacuumEnvironment.LocationState s) {
@@ -74,8 +79,9 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Tests equality against another VacuumEnvironmentState
+     *
      * @param s
-     * @return 
+     * @return
      */
     public boolean equals(VacuumEnvironmentState s) {
         if (!this.state.equals(s.state)) {
@@ -88,10 +94,11 @@ public class VacuumEnvironmentState implements EnvironmentState {
     }
 
     /**
-     * Tests equality against another VacuumEnvironmentState;
-     * necessary for AND-OR search to work
+     * Tests equality against another VacuumEnvironmentState; necessary for
+     * AND-OR search to work
+     *
      * @param o
-     * @return 
+     * @return
      */
     @Override
     public boolean equals(Object o) {
@@ -100,7 +107,8 @@ public class VacuumEnvironmentState implements EnvironmentState {
 
     /**
      * Returns a string representation of the environment
-     * @return 
+     *
+     * @return
      */
     public String toString() {
         return this.state.toString();

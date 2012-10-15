@@ -5,7 +5,6 @@ import aima.core.learning.framework.DataSet;
 import aima.core.learning.framework.Example;
 import aima.core.learning.learners.NeuralNetworkLearner;
 import aima.core.learning.neural.ActivationFunctionHardLimit;
-import aima.core.learning.neural.ActivationFunctionPureLinear;
 import aima.core.util.Util;
 import aima.test.core.unit.learning.framework.DataSetTest;
 import java.io.IOException;

@@ -107,6 +107,7 @@ public class NeuralNetworkLearner implements Learner {
         int[] results = new int[]{0, 0};
         for (Example e : test_set) {
             System.out.println(Arrays.toString(this.predict(e)));
+            System.out.println(Arrays.toString((Double[]) e.getOutput()));
             if (Arrays.equals((Double[]) e.getOutput(), this.predict(e))) {
                 results[0]++;
             } else {
